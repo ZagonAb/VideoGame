@@ -1,8 +1,8 @@
 # VideoGame
 
-![screen1](https://github.com/ZagonAb/VideoGmaes/blob/17a26aec2b7c0d5e59717a945f1e3458ba7d6adf/.meta/screenshots/screen.png)
+![screen1](https://github.com/ZagonAb/VideoGame/blob/f70f6ef9c2571708341340abed07abe5b8966f9a/.meta/screenshots/screen.png)
 
-![screen2](https://github.com/ZagonAb/VideoGmaes/blob/17a26aec2b7c0d5e59717a945f1e3458ba7d6adf/.meta/screenshots/screen1.png)
+![screen2](https://github.com/ZagonAb/VideoGame/blob/f70f6ef9c2571708341340abed07abe5b8966f9a/.meta/screenshots/screen1.png)
 
 - Un tema para Pegasus Frontend.
 - Inspirado en la colección de "ALLGAMES" de Titanius Launcher.
