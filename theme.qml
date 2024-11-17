@@ -66,7 +66,7 @@ FocusScope {
 
         Rectangle {
             id: alphabetSelector
-            width: 40
+            width: 50
             height: parent.height * 0.95
             color: "#000000"
             anchors.left: parent.left
