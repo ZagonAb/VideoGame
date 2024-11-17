@@ -1,4 +1,4 @@
-# Anbernic Theme
+# VideoGame
 
 ![screen1](https://github.com/ZagonAb/VideoGmaes/blob/17a26aec2b7c0d5e59717a945f1e3458ba7d6adf/.meta/screenshots/screen.png)
 
@@ -7,6 +7,7 @@
 - Un tema para Pegasus Frontend.
 - Inspirado en la colección de "ALLGAMES" de Titanius Launcher.
 - Opción de búsqueda por letra.
+- AL finalizar el video mostrara el boxFront del juego.
 
 
 ## Instalación
