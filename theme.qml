@@ -15,13 +15,16 @@ FocusScope {
     width: parent.width
     height: parent.height
 
-    function findCollectionForGame(gameTitle) {
+    function findCollectionForGame(gameObject) {
         for (var i = 0; i < api.collections.count; i++) {
             var collection = api.collections.get(i);
             for (var j = 0; j < collection.games.count; j++) {
-                if (collection.games.get(j).title === gameTitle) {
+                var game = collection.games.get(j);
+                if (game.title === gameObject.title &&
+                    game.assets.video === gameObject.assets.video &&
+                    game.assets.boxFront === gameObject.assets.boxFront) {
                     return collection.name;
-                }
+                    }
             }
         }
         return "Unknown Collection";
@@ -49,7 +52,7 @@ FocusScope {
             gameListView.currentIndex = 0;
             game = gameListView.model.get(0);
             gameVideo.source = game.assets.video;
-            boxFrontImage.source = ""; // Limpiamos la imagen cuando seleccionamos un nuevo juego
+            boxFrontImage.source = "";
             videoEnded = false;
         } else {
             game = null;
@@ -81,6 +84,7 @@ FocusScope {
                     width: alphabetSelector.width
                     height: root.height * 0.035
                     color: currentFilter === modelData ? "#ffffff" : "transparent"
+                    radius: 3
 
                     Text {
                         anchors.centerIn: parent
@@ -130,7 +134,7 @@ FocusScope {
                     }
 
                     Text {
-                        text: root.findCollectionForGame(model.title)
+                        text: root.findCollectionForGame(model)
                         color: gameListView.currentIndex === index ? "#000000" : "#aaaaaa"
                         font.pixelSize: 12
                         elide: Text.ElideRight
@@ -151,7 +155,7 @@ FocusScope {
             onCurrentIndexChanged: {
                 game = gameListView.model.get(currentIndex);
                 gameVideo.source = game.assets.video;
-                boxFrontImage.source = ""; // Limpiamos la imagen cuando seleccionamos un nuevo juego
+                boxFrontImage.source = "";
                 videoEnded = false;
             }
 
@@ -173,6 +177,38 @@ FocusScope {
                 game = gameListView.model.get(currentIndex);
                 gameVideo.source = game.assets.video;
                 boxFrontImage.source = "";
+            }
+
+            Keys.onReturnPressed: {
+                if (filteredGames.count > 0) {
+                    const filteredGame = filteredGames.get(gameListView.currentIndex);
+                    if (filteredGame) {
+                        let collectionFound = false;
+                        for (let i = 0; i < api.collections.count; i++) {
+                            const collection = api.collections.get(i);
+                            for (let j = 0; j < collection.games.count; j++) {
+                                const game = collection.games.get(j);
+                                if (game.title === filteredGame.title &&
+                                    game.assets.video === filteredGame.assets.video &&
+                                    game.assets.boxFront === filteredGame.assets.boxFront) {
+                                    console.log("Colección actual:", collection.name);
+                                console.log("Lanzando juego:", game.title);
+                                game.launch();
+                                collectionFound = true;
+                                break;
+                                    }
+                            }
+                            if (collectionFound) break;
+                        }
+                        if (!collectionFound) {
+                            console.log("No se encontró el juego en ninguna colección");
+                        }
+                    } else {
+                        console.log("No se pudo obtener el juego del modelo filtrado");
+                    }
+                } else {
+                    console.log("No hay juegos para lanzar");
+                }
             }
         }
 
