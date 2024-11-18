@@ -8,6 +8,7 @@
 - Inspirado en la colección de "ALLGAMES" de Titanius Launcher.
 - Opción de búsqueda por letra. (se me ocurrió aquí)
 - AL finalizar el video mostrara el boxFront del juego.
+- Manejo con teclas arriba y abajo en el listview, para seleccionar la letra hazlo con el mouse.
 
 
 ## Instalación
