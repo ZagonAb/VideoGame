@@ -1,4 +1,3 @@
-
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtGraphicalEffects 1.12
@@ -241,7 +240,7 @@ FocusScope {
                 source: ""
                 fillMode: VideoOutput.PreserveAspectFit
                 autoPlay: true
-                loops: 1 // Reproducción del video solo una vez
+                loops: 1
                 visible: !videoEnded
                 onSourceChanged: {
                     if (source !== "") {
