@@ -85,24 +85,55 @@ FocusScope {
                 delegate: Rectangle {
                     width: alphabetSelector.width
                     height: root.height * 0.035
+                    //color: currentFilter === modelData ? "#ffffff" : "transparent"
                     color: alphabetList.currentIndex === index ? "#ffffff" : "transparent"
                     radius: 3
+
+                    /*Text {
+                        anchors.centerIn: parent
+                        text: modelData
+                        color: currentFilter === modelData ? "#000000" : "#ffffff"
+                        font.pixelSize: root.width * 0.010
+                        font.bold: currentFilter === modelData
+                    }*/
 
                     Text {
                         anchors.centerIn: parent
                         text: modelData
+                        // Actualizamos el color basado en currentIndex
                         color: alphabetList.currentIndex === index ? "#000000" : "#ffffff"
                         font.pixelSize: root.width * 0.010
                         font.bold: alphabetList.currentIndex === index
                     }
 
-                    /*MouseArea {
+                    MouseArea {
                         anchors.fill: parent
                         onClicked: {
                             currentFilter = modelData;
                             filteredGames.updateFilter();
                         }
-                    }*/
+                    }
+                }
+
+                Keys.onPressed: (event) => {
+                    if (!event.isAutoRepeat) {
+                        if (api.keys.isNextPage(event)) {
+                            if (currentIndex < count - 1) {
+                                currentIndex++;
+                                currentFilter = model[currentIndex];
+                                filteredGames.updateFilter();
+                            }
+                            event.accepted = true;
+                        }
+                        else if (api.keys.isPrevPage(event)) {
+                            if (currentIndex > 0) {
+                                currentIndex--;
+                                currentFilter = model[currentIndex];
+                                filteredGames.updateFilter();
+                            }
+                            event.accepted = true;
+                        }
+                    }
                 }
             }
         }
@@ -154,29 +185,6 @@ FocusScope {
             }
 
             focus: true
-
-            Item {
-                anchors.fill: parent
-                visible: filteredGames.count === 0
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "No games available"
-                    color: "#ffffff"
-                    font.pixelSize: root.width * 0.02
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    layer.enabled: true
-                    layer.effect: DropShadow {
-                        radius: 50
-                        samples: 50
-                        color: "white"
-                        horizontalOffset: -2
-                        verticalOffset: 5
-                        spread: 0.35
-                    }
-                }
-            }
             onCurrentIndexChanged: {
                 game = gameListView.model.get(currentIndex);
                 gameVideo.source = game.assets.video;
@@ -203,51 +211,47 @@ FocusScope {
                 gameVideo.source = game.assets.video;
                 boxFrontImage.source = "";
             }
+
             Keys.onPressed: (event) => {
-                if (!event.isAutoRepeat) {
-                    if (api.keys.isAccept(event)) {
-                        if (filteredGames.count > 0) {
-                            const filteredGame = filteredGames.get(gameListView.currentIndex);
-                            if (filteredGame) {
-                                let collectionFound = false;
-                                for (let i = 0; i < api.collections.count; i++) {
-                                    const collection = api.collections.get(i);
-                                    for (let j = 0; j < collection.games.count; j++) {
-                                        const game = collection.games.get(j);
-                                        if (game.title === filteredGame.title &&
-                                            game.assets.video === filteredGame.assets.video &&
-                                            game.assets.boxFront === filteredGame.assets.boxFront) {
-                                            console.log("Colección actual:", collection.name);
-                                        console.log("Lanzando juego:", game.title);
-                                        game.launch();
-                                        collectionFound = true;
-                                        break;
-                                            }
-                                    }
-                                    if (collectionFound) break;
+                if (!event.isAutoRepeat && api.keys.isAccept(event)) {
+                    if (filteredGames.count > 0) {
+                        const filteredGame = filteredGames.get(gameListView.currentIndex);
+                        if (filteredGame) {
+                            let collectionFound = false;
+                            for (let i = 0; i < api.collections.count; i++) {
+                                const collection = api.collections.get(i);
+                                for (let j = 0; j < collection.games.count; j++) {
+                                    const game = collection.games.get(j);
+                                    if (game.title === filteredGame.title &&
+                                        game.assets.video === filteredGame.assets.video &&
+                                        game.assets.boxFront === filteredGame.assets.boxFront) {
+                                        console.log("Colección actual:", collection.name);
+                                    console.log("Lanzando juego:", game.title);
+                                    game.launch();
+                                    collectionFound = true;
+                                    break;
+                                        }
                                 }
+                                if (collectionFound) break;
                             }
+                            if (!collectionFound) {
+                                console.log("No se encontró el juego en ninguna colección");
+                            }
+                        } else {
+                            console.log("No se pudo obtener el juego del modelo filtrado");
                         }
-                        event.accepted = true;
+                    } else {
+                        console.log("No hay juegos para lanzar");
                     }
-                    else if (api.keys.isNextPage(event)) {
-                        if (alphabetList.currentIndex < alphabetList.count - 1) {
-                            alphabetList.currentIndex++;
-                            currentFilter = alphabetList.model[alphabetList.currentIndex];
-                            filteredGames.updateFilter();
-                        }
-                        event.accepted = true;
-                    }
-                    else if (api.keys.isPrevPage(event)) {
-                        if (alphabetList.currentIndex > 0) {
-                            alphabetList.currentIndex--;
-                            currentFilter = alphabetList.model[alphabetList.currentIndex];
-                            filteredGames.updateFilter();
-                        }
-                        event.accepted = true;
-                    }
+                    // Evita que el evento se propague a otros manejadores
+                    event.accepted = true;
+                } else if (api.keys.isFilters(event)) {
+                    // Cambiamos el foco al alphabetList cuando se presiona la tecla de filtros
+                    alphabetList.forceActiveFocus();
+                    event.accepted = true;
                 }
             }
+
         }
 
         Item {
@@ -301,30 +305,6 @@ FocusScope {
                 source: ""
                 fillMode: Image.PreserveAspectFit
                 visible: videoEnded
-            }
-
-            Item {
-                anchors.fill: parent
-                visible: filteredGames.count === 0
-
-                Text {
-                    id: noGames
-                    anchors.centerIn: parent
-                    text: "No games available"
-                    color: "#ffffff"
-                    font.pixelSize: root.width * 0.02
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    layer.enabled: true
-                    layer.effect: DropShadow {
-                        radius: 50
-                        samples: 50
-                        color: "white"
-                        horizontalOffset: -2
-                        verticalOffset: 5
-                        spread: 0.35
-                    }
-                }
             }
         }
     }
