@@ -96,13 +96,14 @@ FocusScope {
                         font.bold: alphabetList.currentIndex === index
                     }
 
-                    /*MouseArea {
+                    MouseArea {
                         anchors.fill: parent
                         onClicked: {
+                            alphabetList.currentIndex = index;
                             currentFilter = modelData;
                             filteredGames.updateFilter();
                         }
-                    }*/
+                    }
                 }
             }
         }
@@ -149,6 +150,30 @@ FocusScope {
                     onClicked: {
                         gameListView.currentIndex = index;
                         videoEnded = false;
+                    }
+                    onDoubleClicked: {
+                        if (filteredGames.count > 0) {
+                            const filteredGame = filteredGames.get(index);
+                            if (filteredGame) {
+                                let collectionFound = false;
+                                for (let i = 0; i < api.collections.count; i++) {
+                                    const collection = api.collections.get(i);
+                                    for (let j = 0; j < collection.games.count; j++) {
+                                        const game = collection.games.get(j);
+                                        if (game.title === filteredGame.title &&
+                                            game.assets.video === filteredGame.assets.video &&
+                                            game.assets.boxFront === filteredGame.assets.boxFront) {
+                                            console.log("Colección actual:", collection.name);
+                                        console.log("Lanzando juego:", game.title);
+                                        game.launch();
+                                        collectionFound = true;
+                                        break;
+                                            }
+                                    }
+                                    if (collectionFound) break;
+                                }
+                            }
+                        }
                     }
                 }
             }
