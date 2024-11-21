@@ -1,5 +1,7 @@
 # VideoGame
 
+![gif](https://github.com/ZagonAb/VideoGame/blob/82516923a51bc9c3b1269bd9ee683f485ce23750/.meta/screenshots/Demo.gif)
+
 ![screen1](https://github.com/ZagonAb/VideoGame/blob/f70f6ef9c2571708341340abed07abe5b8966f9a/.meta/screenshots/screen.png)
 
 ![screen2](https://github.com/ZagonAb/VideoGame/blob/f70f6ef9c2571708341340abed07abe5b8966f9a/.meta/screenshots/screen1.png)
