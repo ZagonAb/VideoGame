@@ -324,45 +324,53 @@ FocusScope {
             anchors.left: alphabetSelector.right
             anchors.top: gameListView.bottom  // Lo posiciona debajo del ListView
             anchors.topMargin: 10
-            spacing: 6
+            spacing: 15
 
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                source: "assets/icons/lb.png"
-                width: root.width * 0.024
-                height: root.height * 0.04
-                mipmap: true
+            Row {
+                spacing: 3
+
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "assets/icons/lb.png"
+                    width: root.width * 0.024
+                    height: root.height * 0.04
+                    mipmap: true
+                }
+
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "assets/icons/rb.png"
+                    width: root.width * 0.024
+                    height: root.height * 0.04
+                    mipmap: true
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "FILTER BY LETTER"
+                    font.family: fontLoader.name
+                    font.pixelSize: root.width * 0.015
+                    color: "white"
+                }
             }
 
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                source: "assets/icons/rb.png"
-                width: root.width * 0.024
-                height: root.height * 0.04
-                mipmap: true
-            }
+            Row{
+                spacing: 3
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "FILTER BY LETTER"
-                font.family: fontLoader.name
-                font.pixelSize: root.width * 0.015
-                color: "white"
-            }
-
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                source: "assets/icons/a.png"
-                width: root.width * 0.024
-                height: root.height * 0.04
-                mipmap: true
-            }
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "LAUNCH"
-                font.family: fontLoader.name
-                font.pixelSize: root.width * 0.015
-                color: "white"
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "assets/icons/a.png"
+                    width: root.width * 0.024
+                    height: root.height * 0.044
+                    mipmap: true
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "LAUNCH"
+                    font.family: fontLoader.name
+                    font.pixelSize: root.width * 0.015
+                    color: "white"
+                }
             }
         }
 
