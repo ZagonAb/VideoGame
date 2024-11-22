@@ -62,6 +62,11 @@ FocusScope {
         }
     }
 
+    FontLoader {
+        id: fontLoader
+        source: "assets/font/BebasNeue-Regular.ttf"
+    }
+
     Rectangle {
         id: container
         width: parent.width
@@ -92,7 +97,8 @@ FocusScope {
                         anchors.centerIn: parent
                         text: modelData
                         color: alphabetList.currentIndex === index ? "#000000" : "#ffffff"
-                        font.pixelSize: root.width * 0.010
+                        font.family: fontLoader.name
+                        font.pixelSize: root.width * 0.012
                         font.bold: alphabetList.currentIndex === index
                     }
 
@@ -108,16 +114,47 @@ FocusScope {
             }
         }
 
+        Row {
+            id: headerRow
+            width: parent.width
+            height: parent.height * 0.05 // Ajusta según la altura deseada
+            anchors.top: parent.top // Asegúrate de anclarlo al borde superior del contenedor
+            anchors.topMargin: 10 // Margen superior para separar del borde
+            anchors.left: parent.left
+            anchors.margins: 5
+            anchors.leftMargin: root.width * 0.1
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter // Centra verticalmente la imagen
+                source: "assets/icons/allgames.png"
+                width: root.width * 0.024
+                height: root.height * 0.04
+                mipmap: true
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter // Centra verticalmente el texto
+                text: "All Games"
+                font.family: fontLoader.name
+                font.pixelSize: root.width * 0.020
+                color: "white"
+            }
+        }
+
+
         ListView {
             id: gameListView
             width: parent.width / 3 - alphabetSelector.width
-            height: parent.height
+            height: parent.height * 0.85
             anchors.left: alphabetSelector.right
+            anchors.verticalCenter: parent.verticalCenter
+
             model: filteredGames
             clip: true
             currentIndex: 0
+
             delegate: Rectangle {
-                width: gameListView.width
+                width: gameListView.width -10
                 height: 70
                 color: gameListView.currentIndex === index ? "#ffffff" : "#000000"
                 radius: 5
@@ -126,11 +163,13 @@ FocusScope {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 10
-                    spacing: 5
+                    spacing: 1
 
                     Text {
                         text: model.title
                         color: gameListView.currentIndex === index ? "#000000" : "#ffffff"
+                        font.family: fontLoader.name
+                        font.pixelSize: root.width * 0.014
                         font.bold: gameListView.currentIndex === index
                         elide: Text.ElideRight
                         width: gameListView.width - 20
@@ -139,7 +178,9 @@ FocusScope {
                     Text {
                         text: root.findCollectionForGame(model)
                         color: gameListView.currentIndex === index ? "#000000" : "#aaaaaa"
-                        font.pixelSize: 12
+                        font.family: fontLoader.name
+                        //font.pixelSize: 12
+                        font.pixelSize: root.width * 0.011
                         elide: Text.ElideRight
                         width: gameListView.width - 20
                     }
@@ -188,6 +229,7 @@ FocusScope {
                     anchors.centerIn: parent
                     text: "No games available"
                     color: "#ffffff"
+                    font.family: fontLoader.name
                     font.pixelSize: root.width * 0.02
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -338,6 +380,7 @@ FocusScope {
                     text: "No games available"
                     color: "#ffffff"
                     font.pixelSize: root.width * 0.02
+                    font.family: fontLoader.name
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     layer.enabled: true
