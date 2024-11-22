@@ -317,6 +317,55 @@ FocusScope {
             }
         }
 
+        Row {
+            id: filterRow
+            width: gameListView.width
+            height: parent.height * 0.05
+            anchors.left: alphabetSelector.right
+            anchors.top: gameListView.bottom  // Lo posiciona debajo del ListView
+            anchors.topMargin: 10
+            spacing: 6
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "assets/icons/lb.png"
+                width: root.width * 0.024
+                height: root.height * 0.04
+                mipmap: true
+            }
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "assets/icons/rb.png"
+                width: root.width * 0.024
+                height: root.height * 0.04
+                mipmap: true
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "FILTER BY LETTER"
+                font.family: fontLoader.name
+                font.pixelSize: root.width * 0.015
+                color: "white"
+            }
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                source: "assets/icons/a.png"
+                width: root.width * 0.024
+                height: root.height * 0.04
+                mipmap: true
+            }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "LAUNCH"
+                font.family: fontLoader.name
+                font.pixelSize: root.width * 0.015
+                color: "white"
+            }
+        }
+
         Item {
             id: videoContend
             width: parent.width * 2 / 3
