@@ -8,6 +8,7 @@
 
 - Un tema para **Pegasus Frontend.**
 - Inspirado en la colección de **"ALLGAMES"** de Titanius Launcher.
+- **La interfaz estará sujeta a futuras actualizaciones con el objetivo de optimizar el código y mejorar la experiencia del usuario.**
 - **Opción de búsqueda por letra:** El tema está diseñado para manejar una única colección que agrupa todos los juegos bajo la categoría "All", representada por api.allGames. Esto permite acceder a toda la biblioteca de juegos en una sola lista, con la ventaja de contar con un sistema de filtrado eficiente para encontrar rápidamente un título específico. El filtro se implementa mediante SortFilterProxyModel, que organiza los juegos alfabéticamente (RoleSorter con title) y permite buscar juegos que comiencen con una letra específica usando expresiones regulares. Cuando seleccionas una letra, el filtro actualiza la lista para mostrar únicamente los juegos cuyos títulos comienzan con esa letra. Si seleccionas **"All"**, el filtro se desactiva, mostrando nuevamente todos los juegos de la colección.
 Esta funcionalidad ofrece una experiencia de usuario optimizada, facilitando la navegación por listas extensas de juegos y haciendo que encontrar un título sea rápido y sencillo.
 - **Característica visual:** El tema integra el video del juego y, al finalizar su reproducción, muestra el boxFront correspondiente, mejorando la presentación visual de la interfaz.
