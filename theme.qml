@@ -117,15 +117,15 @@ FocusScope {
         Row {
             id: headerRow
             width: parent.width
-            height: parent.height * 0.05 // Ajusta según la altura deseada
-            anchors.top: parent.top // Asegúrate de anclarlo al borde superior del contenedor
-            anchors.topMargin: 10 // Margen superior para separar del borde
+            height: parent.height * 0.05
+            anchors.top: parent.top
+            anchors.topMargin: 10
             anchors.left: parent.left
             anchors.margins: 5
             anchors.leftMargin: root.width * 0.1
 
             Image {
-                anchors.verticalCenter: parent.verticalCenter // Centra verticalmente la imagen
+                anchors.verticalCenter: parent.verticalCenter
                 source: "assets/icons/allgames.png"
                 width: root.width * 0.024
                 height: root.height * 0.04
@@ -133,7 +133,7 @@ FocusScope {
             }
 
             Text {
-                anchors.verticalCenter: parent.verticalCenter // Centra verticalmente el texto
+                anchors.verticalCenter: parent.verticalCenter
                 text: "All Games"
                 font.family: fontLoader.name
                 font.pixelSize: root.width * 0.020
@@ -413,6 +413,7 @@ FocusScope {
                     if (gameVideo.position === gameVideo.duration) {
                         boxFrontImage.source = game.assets.boxFront;
                         videoEnded = true;
+                        fadeInAnimation.start();
                     }
                 }
             }
@@ -428,6 +429,89 @@ FocusScope {
             }
 
             Item {
+                id: gameDetailsContainer
+                width: parent.width * 0.4
+                height: parent.height * 0.15
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: parent.height * 0.05
+                anchors.right: parent.right
+                anchors.rightMargin: parent.width * 0.05
+                visible: videoEnded
+
+                NumberAnimation {
+                    id: fadeInAnimation
+                    target: gameDetailsContainer
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 800
+                    easing.type: Easing.InOutQuad
+                }
+
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 8
+
+                    Row {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: 2
+                        Repeater {
+                            model: 9
+                            Image {
+                                source: index < Math.round(game ? game.rating * 9 : 0) ?
+                                "assets/icons/star1.png" : "assets/icons/star0.png"
+                                width: gameDetailsContainer.width * 0.08
+                                height: width
+                                mipmap: true
+                            }
+                        }
+                    }
+
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: game ? game.genre.toUpperCase() : ""
+                        color: "#ffffff"
+                        font.family: fontLoader.name
+                        font.pixelSize: root.width * 0.020
+
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                            radius: 20
+                            samples: 50
+                            color: "black"
+                            horizontalOffset: 5
+                            verticalOffset: 0
+                            spread: 0.35
+                        }
+                    }
+
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: {
+                            if (game) {
+                                return (game.developer + ", " + game.releaseYear).toUpperCase()
+                            }
+                            return ""
+                        }
+                        color: "#cccccc"
+                        font.family: fontLoader.name
+                        font.pixelSize: root.width * 0.018
+
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                            radius: 20
+                            samples: 50
+                            color: "black"
+                            horizontalOffset: 5
+                            verticalOffset: 0
+                            spread: 0.35
+                        }
+                    }
+                }
+            }
+
+            Item {
                 anchors.fill: parent
                 visible: filteredGames.count === 0
 
@@ -440,6 +524,7 @@ FocusScope {
                     font.family: fontLoader.name
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+
                     layer.enabled: true
                     layer.effect: DropShadow {
                         radius: 50
