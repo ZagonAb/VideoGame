@@ -322,7 +322,7 @@ FocusScope {
             width: gameListView.width
             height: parent.height * 0.05
             anchors.left: alphabetSelector.right
-            anchors.top: gameListView.bottom  // Lo posiciona debajo del ListView
+            anchors.top: gameListView.bottom
             anchors.topMargin: 10
             spacing: 15
 
