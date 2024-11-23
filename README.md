@@ -1,10 +1,10 @@
 # VideoGame
 
-![gif](https://github.com/ZagonAb/VideoGame/blob/82516923a51bc9c3b1269bd9ee683f485ce23750/.meta/screenshots/demo.gif)
+![gif](https://github.com/ZagonAb/VideoGame/blob/164cfd84fcd31a39ebb36eabd7a2ae40a172f7bb/.meta/screenshots/demo.gif)
 
-![screen1](https://github.com/ZagonAb/VideoGame/blob/f70f6ef9c2571708341340abed07abe5b8966f9a/.meta/screenshots/screen.png)
+![screen1](https://github.com/ZagonAb/VideoGame/blob/164cfd84fcd31a39ebb36eabd7a2ae40a172f7bb/.meta/screenshots/screen.png)
 
-![screen2](https://github.com/ZagonAb/VideoGame/blob/f70f6ef9c2571708341340abed07abe5b8966f9a/.meta/screenshots/screen1.png)
+![screen2](https://github.com/ZagonAb/VideoGame/blob/164cfd84fcd31a39ebb36eabd7a2ae40a172f7bb/.meta/screenshots/screen1.png)
 
 - Un tema para **Pegasus Frontend.**
 - Inspirado en la colección de **"ALLGAMES"** de Titanius Launcher.
