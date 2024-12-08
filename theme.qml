@@ -62,6 +62,24 @@ FocusScope {
         }
     }
 
+    function displayRating(rating) {
+        const fullStars = Math.floor(rating * 10);
+        const hasHalfStar = (rating * 10) % 2 !== 0;
+
+        let ratingDisplay = "";
+        for (let i = 0; i < fullStars; i++) {
+            ratingDisplay += "assets/icons/star1.png ";
+        }
+        if (hasHalfStar) {
+            ratingDisplay += "assets/icons/star05.png ";
+        }
+        for (let i = 0; i < 10 - fullStars - (hasHalfStar ? 1 : 0); i++) {
+            ratingDisplay += "assets/icons/star0.png ";
+        }
+
+        return ratingDisplay.trim();
+    }
+
     FontLoader {
         id: fontLoader
         source: "assets/font/BebasNeue-Regular.ttf"
@@ -457,10 +475,9 @@ FocusScope {
                         anchors.horizontalCenter: parent.horizontalCenter
                         spacing: 2
                         Repeater {
-                            model: 9
+                            model: displayRating(game.rating).split(" ").length
                             Image {
-                                source: index < Math.round(game ? game.rating * 9 : 0) ?
-                                "assets/icons/star1.png" : "assets/icons/star0.png"
+                                source: displayRating(game.rating).split(" ")[index]
                                 width: gameDetailsContainer.width * 0.08
                                 height: width
                                 mipmap: true
