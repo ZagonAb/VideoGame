@@ -80,6 +80,19 @@ FocusScope {
         return ratingDisplay.trim();
     }
 
+    function formatGameGenre(genre) {
+        if (!genre || genre.trim() === "") {
+            return "Unknown genre"
+        }
+
+        const maxLength = 40
+        if (genre.length <= maxLength) {
+            return genre
+        } else {
+            return genre.substring(0, maxLength - 3) + "..."
+        }
+    }
+
     FontLoader {
         id: fontLoader
         source: "assets/font/BebasNeue-Regular.ttf"
@@ -485,12 +498,32 @@ FocusScope {
                         }
                     }
 
-                    Text {
+                    /*Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: game ? game.genre.toUpperCase() : ""
                         color: "#ffffff"
                         font.family: fontLoader.name
                         font.pixelSize: root.width * 0.020
+
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                            radius: 20
+                            samples: 50
+                            color: "black"
+                            horizontalOffset: 5
+                            verticalOffset: 0
+                            spread: 0.35
+                        }
+                    }*/
+
+                    Text {
+                        text: formatGameGenre(game.genre)
+                        color: "white"
+                        font.family: fontLoader.name
+                        font.pixelSize: root.width * 0.020
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        elide: Text.ElideMiddle
 
                         layer.enabled: true
                         layer.effect: DropShadow {
