@@ -498,24 +498,6 @@ FocusScope {
                         }
                     }
 
-                    /*Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: game ? game.genre.toUpperCase() : ""
-                        color: "#ffffff"
-                        font.family: fontLoader.name
-                        font.pixelSize: root.width * 0.020
-
-                        layer.enabled: true
-                        layer.effect: DropShadow {
-                            radius: 20
-                            samples: 50
-                            color: "black"
-                            horizontalOffset: 5
-                            verticalOffset: 0
-                            spread: 0.35
-                        }
-                    }*/
-
                     Text {
                         text: formatGameGenre(game.genre)
                         color: "white"
