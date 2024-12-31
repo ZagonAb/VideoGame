@@ -14,6 +14,18 @@ Esta funcionalidad ofrece una experiencia de usuario optimizada, facilitando la 
 - **Característica visual:** El tema integra el video del juego y, al finalizar su reproducción, muestra el boxFront correspondiente, mejorando la presentación visual de la interfaz.
 - **Manejo de la interfaz:** Navegue por la lista de juegos utilizando las teclas de flecha arriba y abajo, o con el mouse, haciendo un clic para seleccionar un juego y doble clic para lanzarlo. También puede filtrar rápidamente su colección seleccionando una letra específica, ya sea con el mouse o con el gamepad, utilizando los botones **"LB"** y **"RB"**.
 
+ <details>
+<summary>Cambios y mejoras recientes en el Tema 12/24</summary> 
+  <br>
+  
+<details>
+<summary>Cambio de GaussianBlur a FastBlur</summary>
+
+- Reemplazo de GaussianBlur con FastBlur para un mejor desempeño y menor impacto en los recursos.
+</details>
+
+</details>
+
 ## Instalación
 
 [Descarga](https://github.com/ZagonAb/VideoGame/archive/refs/heads/main.zip) y extrae el tema a tu [directorio de temas](http://pegasus-frontend.org/docs/user-guide/installing-themes). Luego puede seleccionarlo en el menú de configuración de Pegasus.
