@@ -11,7 +11,6 @@ FocusScope {
     property var game: null
     property string currentFilter: "All"
     property bool videoEnded: false
-
     width: parent.width
     height: parent.height
 
