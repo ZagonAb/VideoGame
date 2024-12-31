@@ -411,18 +411,20 @@ FocusScope {
             height: parent.height
             anchors.right: parent.right
 
-            GaussianBlur {
-                anchors.fill: parent
-                source: gameVideo
-                radius: 150
-                samples: 125
-            }
-
-            GaussianBlur {
+            FastBlur {
                 anchors.fill: parent
                 source: boxFrontImage
-                radius: 150
-                samples: 125
+                radius: 30
+                cached: true
+                transparentBorder : true
+            }
+
+            FastBlur {
+                anchors.fill: parent
+                source: gameVideo
+                cached: true
+                radius: 60
+                transparentBorder : true
             }
 
             Video {
