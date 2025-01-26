@@ -14,6 +14,10 @@ FocusScope {
     width: parent.width
     height: parent.height
 
+    function getFallbackImage(originalSource, fallbackSource) {
+        return originalSource && originalSource !== "" ? originalSource : fallbackSource;
+    }
+
     function findCollectionForGame(gameObject) {
         for (var i = 0; i < api.collections.count; i++) {
             var collection = api.collections.get(i);
@@ -171,14 +175,12 @@ FocusScope {
             }
         }
 
-
         ListView {
             id: gameListView
             width: parent.width / 3 - alphabetSelector.width
             height: parent.height * 0.85
             anchors.left: alphabetSelector.right
             anchors.verticalCenter: parent.verticalCenter
-
             model: filteredGames
             clip: true
             currentIndex: 0
@@ -209,7 +211,6 @@ FocusScope {
                         text: root.findCollectionForGame(model)
                         color: gameListView.currentIndex === index ? "#000000" : "#aaaaaa"
                         font.family: fontLoader.name
-                        //font.pixelSize: 12
                         font.pixelSize: root.width * 0.011
                         elide: Text.ElideRight
                         width: gameListView.width - 20
@@ -234,8 +235,8 @@ FocusScope {
                                         if (game.title === filteredGame.title &&
                                             game.assets.video === filteredGame.assets.video &&
                                             game.assets.boxFront === filteredGame.assets.boxFront) {
-                                            console.log("Colección actual:", collection.name);
-                                        console.log("Lanzando juego:", game.title);
+                                            //console.log("Colección actual:", collection.name);
+                                        //console.log("Lanzando juego:", game.title);
                                         game.launch();
                                         collectionFound = true;
                                         break;
@@ -265,8 +266,8 @@ FocusScope {
                     verticalAlignment: Text.AlignVCenter
                     layer.enabled: true
                     layer.effect: DropShadow {
-                        radius: 50
-                        samples: 50
+                        radius: 30
+                        samples: 30
                         color: "white"
                         horizontalOffset: -2
                         verticalOffset: 5
@@ -274,9 +275,10 @@ FocusScope {
                     }
                 }
             }
+
             onCurrentIndexChanged: {
                 game = gameListView.model.get(currentIndex);
-                gameVideo.source = game.assets.video;
+                gameVideo.source = game.assets.video
                 boxFrontImage.source = "";
                 videoEnded = false;
             }
@@ -394,6 +396,7 @@ FocusScope {
                     height: root.height * 0.044
                     mipmap: true
                 }
+
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "LAUNCH"
@@ -436,14 +439,24 @@ FocusScope {
                 autoPlay: true
                 loops: 1
                 visible: !videoEnded
+
                 onSourceChanged: {
                     if (source !== "") {
                         gameVideo.play();
                     }
                 }
+
                 onStopped: {
                     if (gameVideo.position === gameVideo.duration) {
-                        boxFrontImage.source = game.assets.boxFront;
+                        boxFrontImage.source = getFallbackImage(game.assets.boxFront, "assets/no-image/default.png");
+                        videoEnded = true;
+                        fadeInAnimation.start();
+                    }
+                }
+
+                onErrorChanged: {
+                    if (error !== MediaPlayer.NoError) {
+                        boxFrontImage.source = getFallbackImage(game.assets.boxFront, "assets/no-image/default.png");
                         videoEnded = true;
                         fadeInAnimation.start();
                     }
@@ -458,6 +471,12 @@ FocusScope {
                 source: ""
                 fillMode: Image.PreserveAspectFit
                 visible: videoEnded
+
+                onStatusChanged: {
+                    if (status === Image.Error) {
+                        source = "assets/no-image/default.png";
+                    }
+                }
             }
 
             Item {
@@ -488,13 +507,20 @@ FocusScope {
                     Row {
                         anchors.horizontalCenter: parent.horizontalCenter
                         spacing: 2
+
                         Repeater {
-                            model: displayRating(game.rating).split(" ").length
+                            model: displayRating(game ? game.rating : 0).split(" ")
                             Image {
-                                source: displayRating(game.rating).split(" ")[index]
+                                source: modelData
                                 width: gameDetailsContainer.width * 0.08
                                 height: width
                                 mipmap: true
+
+                                onStatusChanged: {
+                                    if (status === Image.Error) {
+                                        source = "assets/icons/star0.png";
+                                    }
+                                }
                             }
                         }
                     }
@@ -545,27 +571,32 @@ FocusScope {
             }
 
             Item {
+                id: itemNoGames
                 anchors.fill: parent
-                visible: filteredGames.count === 0
+                visible: filteredGames.count === 0 || gameVideo.status === MediaPlayer.Loading
 
-                Text {
-                    id: noGames
+                Column {
                     anchors.centerIn: parent
-                    text: "No games available"
-                    color: "#ffffff"
-                    font.pixelSize: root.width * 0.02
-                    font.family: fontLoader.name
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+                    spacing: 10
 
-                    layer.enabled: true
-                    layer.effect: DropShadow {
-                        radius: 50
-                        samples: 50
-                        color: "white"
-                        horizontalOffset: -2
-                        verticalOffset: 5
-                        spread: 0.35
+                    Text {
+                        id: loadingText
+                        text: filteredGames.count === 0 ? "No games available" : "Loading..."
+                        color: "#ffffff"
+                        font.pixelSize: root.width * 0.02
+                        font.family: fontLoader.name
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                            radius: 30
+                            samples: 30
+                            color: "white"
+                            horizontalOffset: -2
+                            verticalOffset: 5
+                            spread: 0.35
+                        }
                     }
                 }
             }

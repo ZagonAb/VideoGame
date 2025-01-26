@@ -24,6 +24,20 @@ Esta funcionalidad ofrece una experiencia de usuario optimizada, facilitando la 
 - Reemplazo de GaussianBlur con FastBlur para un mejor desempeño y menor impacto en los recursos.
 </details>
 
+<details>
+<summary>Mejorando la lógica de la interfaz</summary>
+
+- Implementación de estado de carga/sin juegos dinámico:
+
+**Mostrar "Loading..." mientras se cargan los recursos del juego**
+**Cambiar a "No games available" si no hay juegos**
+
+- Mejora de experiencia de usuario con carga de imágenes consistente":
+
+**Agregar imágenes de respaldo cuando fallan los recursos**
+**Usar "assets/no-image/default.png" si no se encuentra video o imagen de portada**
+</details>
+
 </details>
 
 ## Instalación
