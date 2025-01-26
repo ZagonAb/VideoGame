@@ -15,7 +15,7 @@ Esta funcionalidad ofrece una experiencia de usuario optimizada, facilitando la 
 - **Manejo de la interfaz:** Navegue por la lista de juegos utilizando las teclas de flecha arriba y abajo, o con el mouse, haciendo un clic para seleccionar un juego y doble clic para lanzarlo. También puede filtrar rápidamente su colección seleccionando una letra específica, ya sea con el mouse o con el gamepad, utilizando los botones **"LB"** y **"RB"**.
 
  <details>
-<summary>Cambios y mejoras recientes en el Tema 12/24</summary> 
+<summary>Cambios y mejoras recientes en el Tema desde 12/24</summary> 
   <br>
   
 <details>
