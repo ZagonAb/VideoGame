@@ -32,10 +32,10 @@ Esta funcionalidad ofrece una experiencia de usuario optimizada, facilitando la 
 **Mostrar "Loading..." mientras se cargan los recursos del juego**
 **Cambiar a "No games available" si no hay juegos**
 
-- Mejora de experiencia de usuario con carga de imágenes consistente":
+- Mejorar de experiencia de usuario con carga de imágenes consistente":
 
 **Agregar imágenes de respaldo cuando fallan los recursos**
-**Usar "assets/no-image/default.png" si no se encuentra video o imagen de portada**
+**Utilizara "assets/no-image/default.png" si no se encuentra video o imagen de portada**
 </details>
 
 </details>
