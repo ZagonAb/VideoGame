@@ -6,11 +6,11 @@
 
 > 📢 No more updates for now, but if you have any suggestions, they're very welcome!
 
-![gif](https://github.com/ZagonAb/VideoGame/blob/164cfd84fcd31a39ebb36eabd7a2ae40a172f7bb/.meta/screenshots/demo.gif)
+![gif](https://github.com/ZagonAb/VideoGame/blob/e8dedb523f5e00ac3e3ff9a75fefaf19bdbc6838/.meta/screenshots/demo.gif)
 
-![screen1](https://github.com/ZagonAb/VideoGame/blob/164cfd84fcd31a39ebb36eabd7a2ae40a172f7bb/.meta/screenshots/screen.png)
+![screen1](https://github.com/ZagonAb/VideoGame/blob/e8dedb523f5e00ac3e3ff9a75fefaf19bdbc6838/.meta/screenshots/screen.png)
 
-![screen2](https://github.com/ZagonAb/VideoGame/blob/164cfd84fcd31a39ebb36eabd7a2ae40a172f7bb/.meta/screenshots/screen1.png)
+![screen2](https://github.com/ZagonAb/VideoGame/blob/e8dedb523f5e00ac3e3ff9a75fefaf19bdbc6838/.meta/screenshots/screen1.png)
 
 ## Instalación
 
