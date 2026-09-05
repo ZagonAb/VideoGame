@@ -5,15 +5,15 @@
 - Inspired by the **"ALLGAMES"** collection of Titanius Launcher.
 
 
-![screen1](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen.png)
+![screen1](https://github.com/ZagonAb/VideoGame/blob/bf91b993884c2f4d766dd620219512c2da8f1b3a/.meta/screenshots/screen0.png)
 
-![screen2](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen1.png)
+![screen2](https://github.com/ZagonAb/VideoGame/blob/bf91b993884c2f4d766dd620219512c2da8f1b3a/.meta/screenshots/screen1.png)
 
-![screen1](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen.png)
+![screen1](https://github.com/ZagonAb/VideoGame/blob/bf91b993884c2f4d766dd620219512c2da8f1b3a/.meta/screenshots/screen2.png)
 
-![screen2](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen1.png)
+![screen2](https://github.com/ZagonAb/VideoGame/blob/bf91b993884c2f4d766dd620219512c2da8f1b3a/.meta/screenshots/screen3.png)
 
-![screen1](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen.png)
+![screen1](https://github.com/ZagonAb/VideoGame/blob/bf91b993884c2f4d766dd620219512c2da8f1b3a/.meta/screenshots/screen4.png)
 
 
 
