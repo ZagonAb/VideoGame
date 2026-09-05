@@ -7,14 +7,21 @@ Item {
 
     property var game: null
     property string fontFamily: ""
+    property real fontScale: 1.0
+    property var palette: null
     property bool videoEnded: false
     property alias videoSource: gameVideo.source
+    property alias volume: gameVideo.volume
 
     signal videoFinished()
     signal videoError()
 
     function getFallbackImage(originalSource, fallbackSource) {
         return originalSource && originalSource !== "" ? originalSource : fallbackSource;
+    }
+
+    function pauseVideo() {
+        gameVideo.pause();
     }
 
     function resetVideo() {
@@ -193,9 +200,9 @@ Item {
 
             Text {
                 text: game ? gameDetails.formatGameGenre(game.genre) : ""
-                color: "white"
+                color: videoContent.palette ? videoContent.palette.textPrimary : "white"
                 font.family: videoContent.fontFamily
-                font.pixelSize: videoContent.parent.width * 0.020
+                font.pixelSize: videoContent.parent.width * 0.020 * videoContent.fontScale
                 anchors.horizontalCenter: parent.horizontalCenter
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 elide: Text.ElideMiddle
@@ -219,9 +226,9 @@ Item {
                     }
                     return ""
                 }
-                color: "#cccccc"
+                color: videoContent.palette ? videoContent.palette.textSecondary : "#cccccc"
                 font.family: videoContent.fontFamily
-                font.pixelSize: videoContent.parent.width * 0.018
+                font.pixelSize: videoContent.parent.width * 0.018 * videoContent.fontScale
 
                 layer.enabled: true
                 layer.effect: DropShadow {
@@ -275,8 +282,8 @@ Item {
             Text {
                 id: loadingText
                 text: "Loading..."
-                color: "#ffffff"
-                font.pixelSize: videoContent.parent.width * 0.04
+                color: videoContent.palette ? videoContent.palette.textPrimary : "#ffffff"
+                font.pixelSize: videoContent.parent.width * 0.04 * videoContent.fontScale
                 font.family: videoContent.fontFamily
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter

@@ -4,12 +4,18 @@
 
 - Inspired by the **"ALLGAMES"** collection of Titanius Launcher.
 
-> 📢 No more updates for now, but if you have any suggestions, they're very welcome!
-
 
 ![screen1](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen.png)
 
 ![screen2](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen1.png)
+
+![screen1](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen.png)
+
+![screen2](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen1.png)
+
+![screen1](https://github.com/ZagonAb/VideoGame/blob/344f3954f9698fe0e20dd462a56be47e9e423813/.meta/screenshots/screen.png)
+
+
 
 ## Installation
 

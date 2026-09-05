@@ -6,13 +6,16 @@ Rectangle {
     property alias currentIndex: alphabetList.currentIndex
     property alias model: alphabetList.model
     property string fontFamily: ""
+    property real fontScale: 1.0
+    property var palette: null
     property var gameModel: null
+    property int delegateRadius: 50
 
     signal letterSelected(string letter, int index)
 
     width: 50
     height: parent.height * 0.95
-    color: "#000000"
+    color: palette ? palette.background : "#000000"
 
     function countGamesForLetter(letter) {
         if (!gameModel || letter === "All") return 1;
@@ -89,8 +92,8 @@ Rectangle {
 
             width: alphabetSelector.width
             height: alphabetSelector.parent.height * 0.035
-            color: isSelected ? "#ffffff" : "transparent"
-            radius: 3
+            color: isSelected ? (alphabetSelector.palette ? alphabetSelector.palette.accent : "#ffffff") : "transparent"
+            radius: alphabetSelector.delegateRadius
             opacity: letterAvailable ? 1.0 : 0.3
 
             Text {
@@ -98,10 +101,11 @@ Rectangle {
                 text: modelData
                 color: {
                     if (!letterAvailable) return "#666666";
-                    return isSelected ? "#000000" : "#ffffff";
+                    if (isSelected) return alphabetSelector.palette ? alphabetSelector.palette.accentText : "#000000";
+                    return alphabetSelector.palette ? alphabetSelector.palette.textPrimary : "#ffffff";
                 }
                 font.family: alphabetSelector.fontFamily
-                font.pixelSize: alphabetSelector.parent.width * 0.016
+                font.pixelSize: alphabetSelector.parent.width * 0.016 * alphabetSelector.fontScale
                 font.bold: isSelected && letterAvailable
             }
 

@@ -6,6 +6,8 @@ Item {
 
     property var game: null
     property string fontFamily: ""
+    property real fontScale: 1.0
+    property var palette: null
     property real fadeOpacity: 1.0
 
     function displayRating(rating) {
@@ -79,9 +81,9 @@ Item {
 
         Text {
             text: game ? formatGameGenre(game.genre) : ""
-            color: "white"
+            color: gameDetailsContainer.palette ? gameDetailsContainer.palette.textPrimary : "white"
             font.family: gameDetailsContainer.fontFamily
-            font.pixelSize: gameDetailsContainer.parent.width * 0.020
+            font.pixelSize: gameDetailsContainer.parent.width * 0.020 * gameDetailsContainer.fontScale
             anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             elide: Text.ElideMiddle
@@ -105,9 +107,9 @@ Item {
                 }
                 return ""
             }
-            color: "#cccccc"
+            color: gameDetailsContainer.palette ? gameDetailsContainer.palette.textSecondary : "#cccccc"
             font.family: gameDetailsContainer.fontFamily
-            font.pixelSize: gameDetailsContainer.parent.width * 0.018
+            font.pixelSize: gameDetailsContainer.parent.width * 0.018 * gameDetailsContainer.fontScale
 
             layer.enabled: true
             layer.effect: DropShadow {
