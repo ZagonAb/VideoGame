@@ -65,7 +65,9 @@ FocusScope {
     Rectangle {
         id: card
         anchors.centerIn: parent
-        width: Math.min(parent.width * 0.5, parent.height * 0.85, 640)
+        width: notification.expanded
+            ? Math.min(parent.width * 0.82, 860)
+            : Math.min(parent.width * 0.5, 640)
         height: column.height + margin * 2
         radius: 14
         clip: true
@@ -75,7 +77,11 @@ FocusScope {
         opacity: notification.opacity
         scale: notification.cardScale
 
-        property real margin: width * 0.07
+        property real margin: width * 0.02
+
+        Behavior on width {
+            NumberAnimation { duration: 220; easing.type: Easing.OutQuad }
+        }
 
         Behavior on height {
             NumberAnimation { duration: 220; easing.type: Easing.OutQuad }
@@ -87,7 +93,7 @@ FocusScope {
             anchors.topMargin: card.margin
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width - card.margin * 2
-            spacing: card.width * 0.045
+            spacing: card.width * 0.025
 
             Text {
                 width: parent.width
@@ -95,7 +101,7 @@ FocusScope {
                 horizontalAlignment: Text.AlignHCenter
                 font.family: notification.fontFamily
                 font.bold: true
-                font.pixelSize: card.width * 0.075
+                font.pixelSize: card.width * 0.055
                 fontSizeMode: Text.HorizontalFit
                 minimumPixelSize: 14
                 color: notification.palette ? notification.palette.accent : "#ffffff"
@@ -107,7 +113,7 @@ FocusScope {
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
                 font.family: notification.fontFamily
-                font.pixelSize: card.width * 0.045
+                font.pixelSize: card.width * 0.035
                 color: notification.palette ? notification.palette.textPrimary : "white"
             }
 
@@ -118,7 +124,7 @@ FocusScope {
                 Rectangle {
                     id: viewButton
                     width: column.width * 0.3
-                    height: card.width * 0.11
+                    height: card.width * 0.08
                     radius: 8
                     color: activeFocus
                         ? (notification.palette ? notification.palette.accent : "#ffffff")
@@ -131,7 +137,7 @@ FocusScope {
                         text: notification.tr("viewChanges")
                         font.family: notification.fontFamily
                         font.bold: true
-                        font.pixelSize: card.width * 0.038
+                        font.pixelSize: card.width * 0.028
                         fontSizeMode: Text.HorizontalFit
                         minimumPixelSize: 10
                         width: parent.width * 0.9
@@ -170,7 +176,7 @@ FocusScope {
                 Rectangle {
                     id: openButton
                     width: column.width * 0.34
-                    height: card.width * 0.11
+                    height: card.width * 0.08
                     radius: 8
                     color: activeFocus
                         ? (notification.palette ? notification.palette.accent : "#ffffff")
@@ -183,7 +189,7 @@ FocusScope {
                         text: notification.tr("openGithub")
                         font.family: notification.fontFamily
                         font.bold: true
-                        font.pixelSize: card.width * 0.038
+                        font.pixelSize: card.width * 0.028
                         fontSizeMode: Text.HorizontalFit
                         minimumPixelSize: 10
                         width: parent.width * 0.9
@@ -227,7 +233,7 @@ FocusScope {
                 Rectangle {
                     id: closeButton
                     width: column.width * 0.24
-                    height: card.width * 0.11
+                    height: card.width * 0.08
                     radius: 8
                     color: activeFocus
                         ? (notification.palette ? notification.palette.accent : "#ffffff")
@@ -240,7 +246,7 @@ FocusScope {
                         text: notification.tr("close")
                         font.family: notification.fontFamily
                         font.bold: true
-                        font.pixelSize: card.width * 0.038
+                        font.pixelSize: card.width * 0.028
                         fontSizeMode: Text.HorizontalFit
                         minimumPixelSize: 10
                         width: parent.width * 0.9
@@ -277,7 +283,7 @@ FocusScope {
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
                 font.family: notification.fontFamily
-                font.pixelSize: card.width * 0.036
+                font.pixelSize: card.width * 0.026
                 color: notification.palette ? notification.palette.textSecondary : "#cccccc"
             }
 
