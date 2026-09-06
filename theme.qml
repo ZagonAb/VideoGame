@@ -14,7 +14,7 @@ FocusScope {
     height: parent.height
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.0"
+    readonly property string currentVersion: "1.0.1"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -250,6 +250,7 @@ FocusScope {
     property int titleCollectionSpacing: 10
     property int gameDelegateRadius: 5
     property int alphabetDelegateRadius: 50
+    property bool videoPlaybackEnabled: true
     property int videoVolume: 100
     property int sfxVolume: 100
 
@@ -272,6 +273,9 @@ FocusScope {
             spacing: "Title/Collection Spacing",
             gameRadius: "Game List Radius",
             alphaRadius: "A-Z Selector Radius",
+            videoPlayback: "Video Playback",
+            videoPlaybackOn: "ON",
+            videoPlaybackOff: "OFF",
             videoVolume: "Video Volume",
             sfxVolume: "Sound Effects Volume",
             reset: "Reset to Default",
@@ -292,6 +296,9 @@ FocusScope {
             spacing: "Espaciado título/colección",
             gameRadius: "Radio de lista de juegos",
             alphaRadius: "Radio del selector A-Z",
+            videoPlayback: "Reproducción de Video",
+            videoPlaybackOn: "Activado",
+            videoPlaybackOff: "Desactivado",
             videoVolume: "Volumen de video",
             sfxVolume: "Volumen de efectos de sonido",
             reset: "Restaurar valores por defecto",
@@ -313,6 +320,7 @@ FocusScope {
     readonly property int defaultTitleCollectionSpacing: 10
     readonly property int defaultGameDelegateRadius: 5
     readonly property int defaultAlphabetDelegateRadius: 50
+    readonly property bool defaultVideoPlaybackEnabled: true
     readonly property int defaultVideoVolume: 100
     readonly property int defaultSfxVolume: 100
 
@@ -349,6 +357,10 @@ FocusScope {
             const ar = api.memory.get("settingsAlphabetDelegateRadius");
             if (ar >= 0 && ar <= 50) alphabetDelegateRadius = ar;
         }
+        if (api.memory.has("settingsVideoPlaybackEnabled")) {
+            const vpe = api.memory.get("settingsVideoPlaybackEnabled");
+            videoPlaybackEnabled = (vpe === true || vpe === "true");
+        }
         if (api.memory.has("settingsVideoVolume")) {
             const vv = api.memory.get("settingsVideoVolume");
             if (vv >= 0 && vv <= 100) videoVolume = vv;
@@ -362,6 +374,7 @@ FocusScope {
                      "titleCollectionSpacing:", titleCollectionSpacing,
                      "gameDelegateRadius:", gameDelegateRadius,
                      "alphabetDelegateRadius:", alphabetDelegateRadius,
+                     "videoPlaybackEnabled:", videoPlaybackEnabled,
                      "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
     }
 
@@ -373,6 +386,7 @@ FocusScope {
         api.memory.set("settingsTitleCollectionSpacing", titleCollectionSpacing);
         api.memory.set("settingsGameDelegateRadius", gameDelegateRadius);
         api.memory.set("settingsAlphabetDelegateRadius", alphabetDelegateRadius);
+        api.memory.set("settingsVideoPlaybackEnabled", videoPlaybackEnabled);
         api.memory.set("settingsVideoVolume", videoVolume);
         api.memory.set("settingsSfxVolume", sfxVolume);
         console.log("[settings] saved -> fontIndex:", fontIndex, "fontScale:", fontScale,
@@ -380,6 +394,7 @@ FocusScope {
                      "titleCollectionSpacing:", titleCollectionSpacing,
                      "gameDelegateRadius:", gameDelegateRadius,
                      "alphabetDelegateRadius:", alphabetDelegateRadius,
+                     "videoPlaybackEnabled:", videoPlaybackEnabled,
                      "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
     }
 
@@ -391,19 +406,22 @@ FocusScope {
         titleCollectionSpacing = defaultTitleCollectionSpacing;
         gameDelegateRadius = defaultGameDelegateRadius;
         alphabetDelegateRadius = defaultAlphabetDelegateRadius;
+        videoPlaybackEnabled = defaultVideoPlaybackEnabled;
         videoVolume = defaultVideoVolume;
         sfxVolume = defaultSfxVolume;
         saveSettings();
         settingsOverlay.syncValues(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                                     titleCollectionSpacing, gameDelegateRadius,
-                                    alphabetDelegateRadius, videoVolume, sfxVolume);
+                                    alphabetDelegateRadius, videoPlaybackEnabled,
+                                    videoVolume, sfxVolume);
         console.log("[settings] reset to defaults");
     }
 
     function openSettings() {
         settingsOverlay.open(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                               titleCollectionSpacing, gameDelegateRadius,
-                              alphabetDelegateRadius, videoVolume, sfxVolume);
+                              alphabetDelegateRadius, videoPlaybackEnabled,
+                              videoVolume, sfxVolume);
     }
 
     SoundEffect {
@@ -618,12 +636,10 @@ FocusScope {
             Qt.callLater(gameList.positionViewAtBeginning);
             console.log("[persist] updateSelectedGame -> forced gameList.currentIndex = 0");
             game = gameList.model.get(0);
-            videoContent.videoSource = game.assets.video;
             videoContent.resetVideo();
             videoEnded = false;
         } else {
             game = null;
-            videoContent.videoSource = "";
             videoEnded = false;
         }
     }
@@ -680,17 +696,29 @@ FocusScope {
             anchors.leftMargin: root.width * 0.1
             spacing: 10
 
-            Image {
+            Item {
                 anchors.verticalCenter: parent.verticalCenter
-                source: "assets/icons/allgames.svg"
                 width: root.width * 0.024
                 height: root.height * 0.04
-                mipmap: true
+
+                Image {
+                    id: headerIcon
+                    anchors.fill: parent
+                    source: "assets/icons/allgames.svg"
+                    mipmap: true
+                }
+
+                ColorOverlay {
+                    anchors.fill: headerIcon
+                    source: headerIcon
+                    color: (root.palette && root.palette.name === "Ice White") ? root.palette.textPrimary : "white"
+                }
             }
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "VIDEO GAMES"
+                font.underline: true
                 font.family: fontLoader.name
                 font.pixelSize: root.width * 0.020 * root.fontScale
                 color: root.palette.textPrimary
@@ -699,7 +727,7 @@ FocusScope {
 
         GameListView {
             id: gameList
-            width: parent.width / 3 - alphabetSelector.width
+            width: parent.width / 2.5 - alphabetSelector.width
             height: parent.height * 0.85
             anchors.left: alphabetSelector.right
             anchors.verticalCenter: parent.verticalCenter
@@ -725,7 +753,6 @@ FocusScope {
 
             onGameChanged: function(selectedGame) {
                 game = selectedGame;
-                videoContent.videoSource = game.assets.video;
                 videoContent.resetVideo();
                 videoEnded = false;
             }
@@ -778,18 +805,19 @@ FocusScope {
             fontFamily: fontLoader.name
             fontScale: root.fontScale
             palette: root.palette
+            z: 100
         }
 
         VideoContent {
             id: videoContent
-            width: parent.width * 2 / 3
+            width: parent.width * 2 / 3.5
             height: parent.height
             anchors.right: parent.right
             game: root.game
             fontFamily: fontLoader.name
             fontScale: root.fontScale
             palette: root.palette
-            videoEnded: root.videoEnded
+            videoPlaybackEnabled: root.videoPlaybackEnabled
             volume: root.videoVolume / 100
 
             onVideoFinished: {
@@ -1030,6 +1058,13 @@ FocusScope {
 
             onAlphaRadiusPicked: function(value) {
                 root.alphabetDelegateRadius = value;
+                root.saveSettings();
+            }
+
+            onVideoPlaybackPicked: function(value) {
+                console.log("[settings] Video Playback picked ->", value,
+                             "| juego actual:", root.game ? root.game.title : "null");
+                root.videoPlaybackEnabled = value;
                 root.saveSettings();
             }
 

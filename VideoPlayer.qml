@@ -22,8 +22,8 @@ Video {
         }
     }
 
-    onStopped: {
-        if (gameVideo.position === gameVideo.duration) {
+    onStatusChanged: {
+        if (status === MediaPlayer.EndOfMedia) {
             videoEnded = true;
             gameVideo.videoFinished();
         }
