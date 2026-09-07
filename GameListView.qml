@@ -10,6 +10,8 @@ ListView {
     property var gameCollectionFinder: null
     property int titleCollectionSpacing: 10
     property int delegateRadius: 5
+    property bool titleMarqueeEnabled: false
+    property bool collectionMarqueeEnabled: false
     property var soundEffectUp: null
     property var soundEffectDown: null
     property bool subFilterEnabled: true
@@ -42,27 +44,199 @@ ListView {
             anchors.leftMargin: 10
             spacing: gameListView.titleCollectionSpacing
 
-            Text {
-                text: model.title
-                color: gameListView.currentIndex === index
-                    ? (gameListView.palette ? gameListView.palette.accentText : "#000000")
-                    : (gameListView.palette ? gameListView.palette.textPrimary : "#ffffff")
-                font.family: gameListView.fontFamily
-                font.pixelSize: gameListView.parent.width * 0.018 * gameListView.fontScale
-                font.bold: gameListView.currentIndex === index
-                elide: Text.ElideRight
+            Item {
+                id: titleMarqueeContainer
                 width: gameListView.width - 20
+                height: titleMarqueeText1.height
+                clip: true
+
+                property bool isSelected: gameListView.currentIndex === index
+                property bool needsScroll: gameListView.titleMarqueeEnabled
+                    && titleMarqueeText1.implicitWidth > titleMarqueeContainer.width
+                property real scrollOffset: 0
+                property real cycleWidth: titleMarqueeText1.implicitWidth + titleMarqueeSep.implicitWidth
+
+                function textColor() {
+                    return isSelected
+                        ? (gameListView.palette ? gameListView.palette.accentText : "#000000")
+                        : (gameListView.palette ? gameListView.palette.textPrimary : "#ffffff");
+                }
+
+                Text {
+                    id: titleMarqueeText1
+                    text: model.title
+                    color: titleMarqueeContainer.textColor()
+                    font.family: gameListView.fontFamily
+                    font.pixelSize: gameListView.parent.width * 0.018 * gameListView.fontScale
+                    font.bold: titleMarqueeContainer.isSelected
+                    elide: (titleMarqueeContainer.isSelected && gameListView.titleMarqueeEnabled) ? Text.ElideNone : Text.ElideRight
+                    width: (titleMarqueeContainer.isSelected && gameListView.titleMarqueeEnabled) ? implicitWidth : titleMarqueeContainer.width
+                    x: -titleMarqueeContainer.scrollOffset
+                    y: 0
+                }
+
+                Text {
+                    id: titleMarqueeSep
+                    text: "  •  "
+                    color: titleMarqueeContainer.textColor()
+                    font.family: gameListView.fontFamily
+                    font.pixelSize: gameListView.parent.width * 0.018 * gameListView.fontScale
+                    font.bold: titleMarqueeContainer.isSelected
+                    elide: Text.ElideNone
+                    x: titleMarqueeText1.implicitWidth - titleMarqueeContainer.scrollOffset
+                    y: 0
+                    visible: titleMarqueeContainer.needsScroll
+                }
+
+                Text {
+                    id: titleMarqueeText2
+                    text: model.title
+                    color: titleMarqueeContainer.textColor()
+                    font.family: gameListView.fontFamily
+                    font.pixelSize: gameListView.parent.width * 0.018 * gameListView.fontScale
+                    font.bold: titleMarqueeContainer.isSelected
+                    elide: Text.ElideNone
+                    x: titleMarqueeText1.implicitWidth + titleMarqueeSep.implicitWidth - titleMarqueeContainer.scrollOffset
+                    y: 0
+                    visible: titleMarqueeContainer.needsScroll
+                }
+
+                NumberAnimation {
+                    id: titleMarqueeAnim
+                    target: titleMarqueeContainer
+                    property: "scrollOffset"
+                    from: 0
+                    to: titleMarqueeContainer.cycleWidth
+                    duration: titleMarqueeContainer.cycleWidth * 22
+                    easing.type: Easing.Linear
+                    loops: Animation.Infinite
+                    running: false
+                }
+
+                Timer {
+                    id: titleMarqueeStartTimer
+                    interval: 1000
+                    repeat: false
+                    onTriggered: {
+                        if (titleMarqueeContainer.isSelected && titleMarqueeContainer.needsScroll) {
+                            titleMarqueeAnim.start();
+                        }
+                    }
+                }
+
+                onIsSelectedChanged: {
+                    titleMarqueeStartTimer.stop();
+                    titleMarqueeAnim.stop();
+                    titleMarqueeContainer.scrollOffset = 0;
+                    if (isSelected && needsScroll) {
+                        titleMarqueeStartTimer.restart();
+                    }
+                }
+
+                onNeedsScrollChanged: {
+                    titleMarqueeStartTimer.stop();
+                    titleMarqueeAnim.stop();
+                    titleMarqueeContainer.scrollOffset = 0;
+                    if (isSelected && needsScroll) {
+                        titleMarqueeStartTimer.restart();
+                    }
+                }
             }
 
-            Text {
-                text: gameListView.gameCollectionFinder ? gameListView.gameCollectionFinder(model) : "Unknown Collection"
-                color: gameListView.currentIndex === index
-                    ? (gameListView.palette ? gameListView.palette.accentText : "#000000")
-                    : (gameListView.palette ? gameListView.palette.textSecondary : "#aaaaaa")
-                font.family: gameListView.fontFamily
-                font.pixelSize: gameListView.parent.width * 0.015 * gameListView.fontScale
-                elide: Text.ElideRight
+            Item {
+                id: collectionMarqueeContainer
                 width: gameListView.width - 20
+                height: collectionMarqueeText1.height
+                clip: true
+
+                property bool isSelected: gameListView.currentIndex === index
+                property bool needsScroll: gameListView.collectionMarqueeEnabled
+                    && collectionMarqueeText1.implicitWidth > collectionMarqueeContainer.width
+                property real scrollOffset: 0
+                property real cycleWidth: collectionMarqueeText1.implicitWidth + collectionMarqueeSep.implicitWidth
+
+                function textColor() {
+                    return isSelected
+                        ? (gameListView.palette ? gameListView.palette.accentText : "#000000")
+                        : (gameListView.palette ? gameListView.palette.textSecondary : "#aaaaaa");
+                }
+
+                Text {
+                    id: collectionMarqueeText1
+                    text: gameListView.gameCollectionFinder ? gameListView.gameCollectionFinder(model) : "Unknown Collection"
+                    color: collectionMarqueeContainer.textColor()
+                    font.family: gameListView.fontFamily
+                    font.pixelSize: gameListView.parent.width * 0.015 * gameListView.fontScale
+                    elide: (collectionMarqueeContainer.isSelected && gameListView.collectionMarqueeEnabled) ? Text.ElideNone : Text.ElideRight
+                    width: (collectionMarqueeContainer.isSelected && gameListView.collectionMarqueeEnabled) ? implicitWidth : collectionMarqueeContainer.width
+                    x: -collectionMarqueeContainer.scrollOffset
+                    y: 0
+                }
+
+                Text {
+                    id: collectionMarqueeSep
+                    text: "  •  "
+                    color: collectionMarqueeContainer.textColor()
+                    font.family: gameListView.fontFamily
+                    font.pixelSize: gameListView.parent.width * 0.015 * gameListView.fontScale
+                    elide: Text.ElideNone
+                    x: collectionMarqueeText1.implicitWidth - collectionMarqueeContainer.scrollOffset
+                    y: 0
+                    visible: collectionMarqueeContainer.needsScroll
+                }
+
+                Text {
+                    id: collectionMarqueeText2
+                    text: gameListView.gameCollectionFinder ? gameListView.gameCollectionFinder(model) : "Unknown Collection"
+                    color: collectionMarqueeContainer.textColor()
+                    font.family: gameListView.fontFamily
+                    font.pixelSize: gameListView.parent.width * 0.015 * gameListView.fontScale
+                    elide: Text.ElideNone
+                    x: collectionMarqueeText1.implicitWidth + collectionMarqueeSep.implicitWidth - collectionMarqueeContainer.scrollOffset
+                    y: 0
+                    visible: collectionMarqueeContainer.needsScroll
+                }
+
+                NumberAnimation {
+                    id: collectionMarqueeAnim
+                    target: collectionMarqueeContainer
+                    property: "scrollOffset"
+                    from: 0
+                    to: collectionMarqueeContainer.cycleWidth
+                    duration: collectionMarqueeContainer.cycleWidth * 22
+                    easing.type: Easing.Linear
+                    loops: Animation.Infinite
+                    running: false
+                }
+
+                Timer {
+                    id: collectionMarqueeStartTimer
+                    interval: 1500
+                    repeat: false
+                    onTriggered: {
+                        if (collectionMarqueeContainer.isSelected && collectionMarqueeContainer.needsScroll) {
+                            collectionMarqueeAnim.start();
+                        }
+                    }
+                }
+
+                onIsSelectedChanged: {
+                    collectionMarqueeStartTimer.stop();
+                    collectionMarqueeAnim.stop();
+                    collectionMarqueeContainer.scrollOffset = 0;
+                    if (isSelected && needsScroll) {
+                        collectionMarqueeStartTimer.restart();
+                    }
+                }
+
+                onNeedsScrollChanged: {
+                    collectionMarqueeStartTimer.stop();
+                    collectionMarqueeAnim.stop();
+                    collectionMarqueeContainer.scrollOffset = 0;
+                    if (isSelected && needsScroll) {
+                        collectionMarqueeStartTimer.restart();
+                    }
+                }
             }
         }
 

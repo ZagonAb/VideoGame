@@ -14,7 +14,7 @@ FocusScope {
     height: parent.height
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.1"
+    readonly property string currentVersion: "1.0.2"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -251,6 +251,8 @@ FocusScope {
     property int gameDelegateRadius: 5
     property int alphabetDelegateRadius: 50
     property bool videoPlaybackEnabled: true
+    property bool titleMarqueeEnabled: false
+    property bool collectionMarqueeEnabled: false
     property int videoVolume: 100
     property int sfxVolume: 100
 
@@ -276,6 +278,12 @@ FocusScope {
             videoPlayback: "Video Playback",
             videoPlaybackOn: "ON",
             videoPlaybackOff: "OFF",
+            titleMarquee: "Title Marquee",
+            titleMarqueeOn: "ON",
+            titleMarqueeOff: "OFF",
+            collectionMarquee: "Collection Marquee",
+            collectionMarqueeOn: "ON",
+            collectionMarqueeOff: "OFF",
             videoVolume: "Video Volume",
             sfxVolume: "Sound Effects Volume",
             reset: "Reset to Default",
@@ -299,6 +307,12 @@ FocusScope {
             videoPlayback: "Reproducción de Video",
             videoPlaybackOn: "Activado",
             videoPlaybackOff: "Desactivado",
+            titleMarquee: "Desplazamiento del título",
+            titleMarqueeOn: "Activado",
+            titleMarqueeOff: "Desactivado",
+            collectionMarquee: "Desplazamiento de colección",
+            collectionMarqueeOn: "Activado",
+            collectionMarqueeOff: "Desactivado",
             videoVolume: "Volumen de video",
             sfxVolume: "Volumen de efectos de sonido",
             reset: "Restaurar valores por defecto",
@@ -321,6 +335,8 @@ FocusScope {
     readonly property int defaultGameDelegateRadius: 5
     readonly property int defaultAlphabetDelegateRadius: 50
     readonly property bool defaultVideoPlaybackEnabled: true
+    readonly property bool defaultTitleMarqueeEnabled: false
+    readonly property bool defaultCollectionMarqueeEnabled: false
     readonly property int defaultVideoVolume: 100
     readonly property int defaultSfxVolume: 100
 
@@ -361,6 +377,14 @@ FocusScope {
             const vpe = api.memory.get("settingsVideoPlaybackEnabled");
             videoPlaybackEnabled = (vpe === true || vpe === "true");
         }
+        if (api.memory.has("settingsTitleMarqueeEnabled")) {
+            const tme = api.memory.get("settingsTitleMarqueeEnabled");
+            titleMarqueeEnabled = (tme === true || tme === "true");
+        }
+        if (api.memory.has("settingsCollectionMarqueeEnabled")) {
+            const cme = api.memory.get("settingsCollectionMarqueeEnabled");
+            collectionMarqueeEnabled = (cme === true || cme === "true");
+        }
         if (api.memory.has("settingsVideoVolume")) {
             const vv = api.memory.get("settingsVideoVolume");
             if (vv >= 0 && vv <= 100) videoVolume = vv;
@@ -375,6 +399,8 @@ FocusScope {
                      "gameDelegateRadius:", gameDelegateRadius,
                      "alphabetDelegateRadius:", alphabetDelegateRadius,
                      "videoPlaybackEnabled:", videoPlaybackEnabled,
+                     "titleMarqueeEnabled:", titleMarqueeEnabled,
+                     "collectionMarqueeEnabled:", collectionMarqueeEnabled,
                      "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
     }
 
@@ -387,6 +413,8 @@ FocusScope {
         api.memory.set("settingsGameDelegateRadius", gameDelegateRadius);
         api.memory.set("settingsAlphabetDelegateRadius", alphabetDelegateRadius);
         api.memory.set("settingsVideoPlaybackEnabled", videoPlaybackEnabled);
+        api.memory.set("settingsTitleMarqueeEnabled", titleMarqueeEnabled);
+        api.memory.set("settingsCollectionMarqueeEnabled", collectionMarqueeEnabled);
         api.memory.set("settingsVideoVolume", videoVolume);
         api.memory.set("settingsSfxVolume", sfxVolume);
         console.log("[settings] saved -> fontIndex:", fontIndex, "fontScale:", fontScale,
@@ -395,6 +423,8 @@ FocusScope {
                      "gameDelegateRadius:", gameDelegateRadius,
                      "alphabetDelegateRadius:", alphabetDelegateRadius,
                      "videoPlaybackEnabled:", videoPlaybackEnabled,
+                     "titleMarqueeEnabled:", titleMarqueeEnabled,
+                     "collectionMarqueeEnabled:", collectionMarqueeEnabled,
                      "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
     }
 
@@ -407,12 +437,15 @@ FocusScope {
         gameDelegateRadius = defaultGameDelegateRadius;
         alphabetDelegateRadius = defaultAlphabetDelegateRadius;
         videoPlaybackEnabled = defaultVideoPlaybackEnabled;
+        titleMarqueeEnabled = defaultTitleMarqueeEnabled;
+        collectionMarqueeEnabled = defaultCollectionMarqueeEnabled;
         videoVolume = defaultVideoVolume;
         sfxVolume = defaultSfxVolume;
         saveSettings();
         settingsOverlay.syncValues(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                                     titleCollectionSpacing, gameDelegateRadius,
                                     alphabetDelegateRadius, videoPlaybackEnabled,
+                                    titleMarqueeEnabled, collectionMarqueeEnabled,
                                     videoVolume, sfxVolume);
         console.log("[settings] reset to defaults");
     }
@@ -421,6 +454,7 @@ FocusScope {
         settingsOverlay.open(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                               titleCollectionSpacing, gameDelegateRadius,
                               alphabetDelegateRadius, videoPlaybackEnabled,
+                              titleMarqueeEnabled, collectionMarqueeEnabled,
                               videoVolume, sfxVolume);
     }
 
@@ -737,6 +771,8 @@ FocusScope {
             palette: root.palette
             titleCollectionSpacing: root.titleCollectionSpacing
             delegateRadius: root.gameDelegateRadius
+            titleMarqueeEnabled: root.titleMarqueeEnabled
+            collectionMarqueeEnabled: root.collectionMarqueeEnabled
             gameCollectionFinder: root.findCollectionForGame
             soundEffectUp: soundUp
             soundEffectDown: soundDown
@@ -1065,6 +1101,16 @@ FocusScope {
                 console.log("[settings] Video Playback picked ->", value,
                              "| juego actual:", root.game ? root.game.title : "null");
                 root.videoPlaybackEnabled = value;
+                root.saveSettings();
+            }
+
+            onTitleMarqueePicked: function(value) {
+                root.titleMarqueeEnabled = value;
+                root.saveSettings();
+            }
+
+            onCollectionMarqueePicked: function(value) {
+                root.collectionMarqueeEnabled = value;
                 root.saveSettings();
             }
 

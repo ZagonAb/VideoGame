@@ -15,8 +15,8 @@ Row {
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.parent.width * 0.042
-            height: filterRow.parent.height * 0.064
+            width: filterRow.parent.width * 0.032
+            height: filterRow.parent.height * 0.054
 
             Image {
                 id: lbIcon
@@ -34,8 +34,8 @@ Row {
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.parent.width * 0.042
-            height: filterRow.parent.height * 0.064
+            width: filterRow.parent.width * 0.032
+            height: filterRow.parent.height * 0.054
 
             Image {
                 id: rbIcon

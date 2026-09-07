@@ -294,136 +294,6 @@ Item {
                         }
                     }
                 }
-
-                Item {
-                    id: gameDetails
-                    width: parent.width * 0.4
-                    height: parent.height * 0.15
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: parent.height * 0.05
-                    anchors.right: parent.right
-                    anchors.rightMargin: parent.width * 0.05
-
-                    property real fadeOpacity: 0
-                    opacity: fadeOpacity
-
-                    function displayRating(rating) {
-                        const fullStars = Math.floor(rating * 10);
-                        const hasHalfStar = (rating * 10) % 2 !== 0;
-
-                        let ratingDisplay = "";
-                        for (let i = 0; i < fullStars; i++) {
-                            ratingDisplay += "assets/icons/star1.png ";
-                        }
-                        if (hasHalfStar) {
-                            ratingDisplay += "assets/icons/star05.png ";
-                        }
-                        for (let i = 0; i < 10 - fullStars - (hasHalfStar ? 1 : 0); i++) {
-                            ratingDisplay += "assets/icons/star0.png ";
-                        }
-
-                        return ratingDisplay.trim();
-                    }
-
-                    function formatGameGenre(genre) {
-                        if (!genre || genre.trim() === "") {
-                            return "Unknown genre"
-                        }
-
-                        const maxLength = 40
-                        if (genre.length <= maxLength) {
-                            return genre
-                        } else {
-                            return genre.substring(0, maxLength - 3) + "..."
-                        }
-                    }
-
-                    function startFadeIn() {
-                        fadeInAnimation.start();
-                    }
-
-                    Component.onCompleted: startFadeIn()
-
-                    NumberAnimation {
-                        id: fadeInAnimation
-                        target: gameDetails
-                        property: "fadeOpacity"
-                        from: 0
-                        to: 1
-                        duration: 800
-                        easing.type: Easing.InOutQuad
-                    }
-
-                    Column {
-                        anchors.fill: parent
-                        anchors.margins: 10
-                        spacing: 8
-
-                        Row {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: 2
-
-                            Repeater {
-                                model: videoContent.game ? gameDetails.displayRating(videoContent.game.rating).split(" ") : []
-                                Image {
-                                    source: modelData
-                                    width: gameDetails.width * 0.08
-                                    height: width
-                                    mipmap: true
-
-                                    onStatusChanged: {
-                                        if (status === Image.Error) {
-                                            source = "assets/icons/star0.png";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Text {
-                            text: videoContent.game ? gameDetails.formatGameGenre(videoContent.game.genre) : ""
-                            color: videoContent.palette ? videoContent.palette.textPrimary : "white"
-                            font.family: videoContent.fontFamily
-                            font.pixelSize: videoContent.parent.width * 0.020 * videoContent.fontScale
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            elide: Text.ElideMiddle
-
-                            layer.enabled: true
-                            layer.effect: DropShadow {
-                                radius: 20
-                                samples: 50
-                                color: "black"
-                                horizontalOffset: 5
-                                verticalOffset: 0
-                                spread: 0.35
-                            }
-                        }
-
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: {
-                                if (videoContent.game) {
-                                    return (videoContent.game.developer + ", " + videoContent.game.releaseYear).toUpperCase()
-                                }
-                                return ""
-                            }
-                            color: videoContent.palette ? videoContent.palette.textSecondary : "#cccccc"
-                            font.family: videoContent.fontFamily
-                            font.pixelSize: videoContent.parent.width * 0.018 * videoContent.fontScale
-
-                            layer.enabled: true
-                            layer.effect: DropShadow {
-                                radius: 20
-                                samples: 50
-                                color: "black"
-                                horizontalOffset: 5
-                                verticalOffset: 0
-                                spread: 0.35
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -446,5 +316,20 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
+    }
+
+    GameDetails {
+        id: gameDetails
+        height: parent.height * 0.18
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: parent.height * 0.05
+        anchors.right: parent.right
+        z: 100
+
+        game: videoContent.game
+        fontFamily: videoContent.fontFamily
+        fontScale: videoContent.fontScale
+        palette: videoContent.palette
+        visible: videoContent.displayState === "boxfront"
     }
 }

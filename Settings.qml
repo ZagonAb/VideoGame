@@ -15,6 +15,8 @@ FocusScope {
         spacing: "Title/Collection Spacing", gameRadius: "Game List Radius",
         alphaRadius: "A-Z Selector Radius",
         videoPlayback: "Video Playback", videoPlaybackOn: "ON", videoPlaybackOff: "OFF",
+        titleMarquee: "Title Marquee", titleMarqueeOn: "ON", titleMarqueeOff: "OFF",
+        collectionMarquee: "Collection Marquee", collectionMarqueeOn: "ON", collectionMarqueeOff: "OFF",
         videoVolume: "Video Volume", sfxVolume: "Sound Effects Volume",
         reset: "Reset to Default",
         hint: "\u2191\u2193 Navigate    \u2190\u2192 Change / Reset    B Close"
@@ -34,15 +36,18 @@ FocusScope {
     property int gameRadiusValue: 5
     property int alphaRadiusValue: 50
     property bool videoPlaybackValue: true
+    property bool titleMarqueeValue: false
+    property bool collectionMarqueeValue: false
     property int videoVolumeValue: 100
     property int sfxVolumeValue: 100
     property int activeRow: 0
-    readonly property int rowCount: 11
+    readonly property int rowCount: 13
     onActiveRowChanged: Qt.callLater(scrollToActiveRow)
 
     readonly property var rowItems: [rowFont, rowFontSize, rowColorScheme, rowLanguage,
                                        rowSpacing, rowGameRadius, rowAlphaRadius,
-                                       rowVideoPlayback, rowVideoVolume, rowSfxVolume, rowReset]
+                                       rowVideoPlayback, rowTitleMarquee, rowCollectionMarquee,
+                                       rowVideoVolume, rowSfxVolume, rowReset]
 
     function scrollToActiveRow() {
         if (activeRow < 0 || activeRow >= rowItems.length) return;
@@ -67,6 +72,8 @@ FocusScope {
     signal gameRadiusPicked(int value)
     signal alphaRadiusPicked(int value)
     signal videoPlaybackPicked(bool value)
+    signal titleMarqueePicked(bool value)
+    signal collectionMarqueePicked(bool value)
     signal videoVolumePicked(int value)
     signal sfxVolumePicked(int value)
     signal resetRequested()
@@ -75,8 +82,8 @@ FocusScope {
     visible: opacity > 0
     opacity: 0
 
-    function open(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initVideoVolume, initSfxVolume) {
-        syncValues(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initVideoVolume, initSfxVolume);
+    function open(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume) {
+        syncValues(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume);
         activeRow = 0;
         panelScale = 0.5;
         opacity = 0;
@@ -86,7 +93,7 @@ FocusScope {
         Qt.callLater(scrollToActiveRow);
     }
 
-    function syncValues(fIndex, scale, schemeIndex, langIndex, spacing, gameRadius, alphaRadius, videoPlayback, videoVolume, sfxVolume) {
+    function syncValues(fIndex, scale, schemeIndex, langIndex, spacing, gameRadius, alphaRadius, videoPlayback, titleMarquee, collectionMarquee, videoVolume, sfxVolume) {
         fontIndex = fIndex;
         fontScaleValue = scale;
         colorSchemeIndex = schemeIndex;
@@ -95,6 +102,8 @@ FocusScope {
         gameRadiusValue = gameRadius;
         alphaRadiusValue = alphaRadius;
         videoPlaybackValue = videoPlayback;
+        titleMarqueeValue = titleMarquee;
+        collectionMarqueeValue = collectionMarquee;
         videoVolumeValue = videoVolume;
         sfxVolumeValue = sfxVolume;
     }
@@ -138,14 +147,22 @@ FocusScope {
             videoPlaybackValue = newVideoPlayback;
             videoPlaybackPicked(newVideoPlayback);
         } else if (activeRow === 8) {
+            const newTitleMarquee = !titleMarqueeValue;
+            titleMarqueeValue = newTitleMarquee;
+            titleMarqueePicked(newTitleMarquee);
+        } else if (activeRow === 9) {
+            const newCollectionMarquee = !collectionMarqueeValue;
+            collectionMarqueeValue = newCollectionMarquee;
+            collectionMarqueePicked(newCollectionMarquee);
+        } else if (activeRow === 10) {
             const newVideoVolume = Math.max(0, Math.min(100, videoVolumeValue + direction * 5));
             videoVolumeValue = newVideoVolume;
             videoVolumePicked(newVideoVolume);
-        } else if (activeRow === 9) {
+        } else if (activeRow === 11) {
             const newSfxVolume = Math.max(0, Math.min(100, sfxVolumeValue + direction * 5));
             sfxVolumeValue = newSfxVolume;
             sfxVolumePicked(newSfxVolume);
-        } else if (activeRow === 10) {
+        } else if (activeRow === 12) {
             resetRequested();
         }
     }
@@ -159,7 +176,7 @@ FocusScope {
         if (!event.isAutoRepeat && (api.keys.isCancel(event) || api.keys.isFilters(event))) {
             event.accepted = true;
             settingsRoot.close();
-        } else if (!event.isAutoRepeat && activeRow === 10 && api.keys.isAccept(event)) {
+        } else if (!event.isAutoRepeat && activeRow === 12 && api.keys.isAccept(event)) {
             event.accepted = true;
             resetRequested();
         }
@@ -334,11 +351,37 @@ FocusScope {
                 }
 
                 SettingsRow {
-                    id: rowVideoVolume
+                    id: rowTitleMarquee
                     width: parent.width
                     height: panel.rowHeight
                     panelWidth: panel.width
                     active: settingsRoot.activeRow === 8
+                    fontFamily: settingsRoot.fontFamily
+                    fontScale: settingsRoot.fontScaleValue
+                    palette: settingsRoot.palette
+                    label: settingsRoot.tr("titleMarquee")
+                    valueText: settingsRoot.titleMarqueeValue ? settingsRoot.tr("titleMarqueeOn") : settingsRoot.tr("titleMarqueeOff")
+                }
+
+                SettingsRow {
+                    id: rowCollectionMarquee
+                    width: parent.width
+                    height: panel.rowHeight
+                    panelWidth: panel.width
+                    active: settingsRoot.activeRow === 9
+                    fontFamily: settingsRoot.fontFamily
+                    fontScale: settingsRoot.fontScaleValue
+                    palette: settingsRoot.palette
+                    label: settingsRoot.tr("collectionMarquee")
+                    valueText: settingsRoot.collectionMarqueeValue ? settingsRoot.tr("collectionMarqueeOn") : settingsRoot.tr("collectionMarqueeOff")
+                }
+
+                SettingsRow {
+                    id: rowVideoVolume
+                    width: parent.width
+                    height: panel.rowHeight
+                    panelWidth: panel.width
+                    active: settingsRoot.activeRow === 10
                     fontFamily: settingsRoot.fontFamily
                     fontScale: settingsRoot.fontScaleValue
                     palette: settingsRoot.palette
@@ -351,7 +394,7 @@ FocusScope {
                     width: parent.width
                     height: panel.rowHeight
                     panelWidth: panel.width
-                    active: settingsRoot.activeRow === 9
+                    active: settingsRoot.activeRow === 11
                     fontFamily: settingsRoot.fontFamily
                     fontScale: settingsRoot.fontScaleValue
                     palette: settingsRoot.palette
@@ -364,7 +407,7 @@ FocusScope {
                     width: parent.width
                     height: panel.rowHeight
                     panelWidth: panel.width
-                    active: settingsRoot.activeRow === 10
+                    active: settingsRoot.activeRow === 12
                     fontFamily: settingsRoot.fontFamily
                     fontScale: settingsRoot.fontScaleValue
                     palette: settingsRoot.palette
