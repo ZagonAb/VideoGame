@@ -14,7 +14,7 @@ FocusScope {
     height: parent.height
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.2"
+    readonly property string currentVersion: "1.0.3"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -678,6 +678,39 @@ FocusScope {
         }
     }
 
+    readonly property real aspectRatio: root.height > 0 ? (root.width / root.height) : 1.777
+
+    readonly property string layoutMode: {
+        if (aspectRatio >= 1.55) return "wide";
+        if (aspectRatio >= 1.15) return "standard";
+        return "square";
+    }
+
+    readonly property real referenceMinSide: 1080
+    readonly property real uiScale: Math.min(root.width, root.height) / referenceMinSide
+    readonly property real alphabetSelectorWidth: 50 * uiScale
+    readonly property real headerIconSize: 45 * uiScale
+
+    readonly property var layoutProfiles: ({
+        wide: {
+            gameListWidthFn: function() { return root.width / 2.5 - alphabetSelector.width; },
+            videoWidthFn: function() { return root.width * 2 / 3.5; },
+            videoHeightFn: function() { return root.height; }
+        },
+        standard: {
+            gameListWidthFn: function() { return root.width * 0.46 - alphabetSelector.width; },
+            videoWidthFn: function() { return root.width * 0.50; },
+            videoHeightFn: function() { return root.height; }
+        },
+        square: {
+            gameListWidthFn: function() { return root.width * 0.50 - alphabetSelector.width; },
+            videoWidthFn: function() { return root.width * 0.50; },
+            videoHeightFn: function() { return gameList.height * 0.5; }
+        }
+    })
+
+    readonly property var currentProfile: layoutProfiles[layoutMode]
+
     FontLoader {
         id: fontLoader
         source: root.selectedFontPath
@@ -698,6 +731,7 @@ FocusScope {
 
         AlphabetSelector {
             id: alphabetSelector
+            width: root.alphabetSelectorWidth
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             fontFamily: fontLoader.name
@@ -732,8 +766,8 @@ FocusScope {
 
             Item {
                 anchors.verticalCenter: parent.verticalCenter
-                width: root.width * 0.024
-                height: root.height * 0.04
+                width: root.headerIconSize
+                height: root.headerIconSize
 
                 Image {
                     id: headerIcon
@@ -761,7 +795,7 @@ FocusScope {
 
         GameListView {
             id: gameList
-            width: parent.width / 2.5 - alphabetSelector.width
+            width: root.currentProfile.gameListWidthFn()
             height: parent.height * 0.85
             anchors.left: alphabetSelector.right
             anchors.verticalCenter: parent.verticalCenter
@@ -841,14 +875,17 @@ FocusScope {
             fontFamily: fontLoader.name
             fontScale: root.fontScale
             palette: root.palette
+            uiScale: root.uiScale
             z: 100
         }
 
         VideoContent {
             id: videoContent
-            width: parent.width * 2 / 3.5
-            height: parent.height
+            width: root.currentProfile.videoWidthFn()
+            height: root.currentProfile.videoHeightFn()
             anchors.right: parent.right
+            anchors.top: root.layoutMode === "square" ? gameList.top : undefined
+            anchors.verticalCenter: root.layoutMode === "square" ? undefined : parent.verticalCenter
             game: root.game
             fontFamily: fontLoader.name
             fontScale: root.fontScale
@@ -863,6 +900,23 @@ FocusScope {
             onVideoError: {
                 root.videoEnded = true;
             }
+        }
+
+        GameDescription {
+            id: gameDescriptionPanel
+            visible: root.layoutMode === "square"
+            width: videoContent.width
+            height: root.layoutMode === "square"
+                    ? Math.max(0, gameList.height - videoContent.height - 10)
+                    : 0
+            anchors.right: parent.right
+            anchors.top: videoContent.bottom
+            anchors.topMargin: 10
+            game: root.game
+            fontFamily: fontLoader.name
+            fontScale: root.fontScale
+            palette: root.palette
+            z: 90
         }
 
         Rectangle {
@@ -1154,6 +1208,9 @@ FocusScope {
 
     Component.onCompleted: {
         console.log("[persist] root.onCompleted -> scheduling restoreState() via Qt.callLater");
+        console.log("[layout] aspectRatio:", aspectRatio.toFixed(3),
+                     "layoutMode:", layoutMode,
+                     "uiScale:", uiScale.toFixed(3));
         root.loadSettings();
         Qt.callLater(root.restoreState);
         Qt.callLater(root.checkForUpdates);

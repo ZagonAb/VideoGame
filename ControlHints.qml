@@ -7,6 +7,9 @@ Row {
     property string fontFamily: ""
     property real fontScale: 1.0
     property var palette: null
+    property real uiScale: 1.0
+    readonly property real iconSizeLarge: 60 * uiScale
+    readonly property real iconSizeSmall: 47 * uiScale
 
     spacing: 15
 
@@ -15,8 +18,8 @@ Row {
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.parent.width * 0.032
-            height: filterRow.parent.height * 0.054
+            width: filterRow.iconSizeLarge
+            height: filterRow.iconSizeLarge
 
             Image {
                 id: lbIcon
@@ -34,8 +37,8 @@ Row {
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.parent.width * 0.032
-            height: filterRow.parent.height * 0.054
+            width: filterRow.iconSizeLarge
+            height: filterRow.iconSizeLarge
 
             Image {
                 id: rbIcon
@@ -61,8 +64,8 @@ Row {
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.parent.width * 0.024
-            height: filterRow.parent.height * 0.044
+            width: filterRow.iconSizeSmall
+            height: filterRow.iconSizeSmall
 
             Image {
                 id: aIcon
@@ -88,8 +91,8 @@ Row {
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.parent.width * 0.024
-            height: filterRow.parent.height * 0.044
+            width: filterRow.iconSizeSmall
+            height: filterRow.iconSizeSmall
             visible: settingsHintIcon.visible
 
             Image {

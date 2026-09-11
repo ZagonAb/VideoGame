@@ -15,8 +15,15 @@ Item {
     property real minCardWidth: parent ? parent.width * 0.58 : 400
     property real maxCardWidth: parent ? parent.width * 0.85 : 700
     property real cardHorizontalPadding: 80
+    property real minCardHeight: parent ? parent.height * 0.10 : 80
+
+    property real maxCardHeight: parent
+        ? Math.max(parent.height * 0.24, detailsColumn.implicitHeight + cardVerticalPadding)
+        : 200
+    property real cardVerticalPadding: 40
 
     width: Math.min(maxCardWidth, Math.max(minCardWidth, developerYearMeasure.implicitWidth + cardHorizontalPadding))
+    height: Math.min(maxCardHeight, Math.max(minCardHeight, detailsColumn.implicitHeight + cardVerticalPadding))
 
     property real slideOffset: width
 
@@ -140,7 +147,10 @@ Item {
     }
 
     Column {
-        anchors.fill: parent
+        id: detailsColumn
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
         anchors.margins: 20
         spacing: 4
 

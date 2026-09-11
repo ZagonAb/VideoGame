@@ -257,17 +257,31 @@ Item {
                     anchors.fill: parent
                     clip: true
 
-                    ShaderEffectSource {
-                        id: boxFrontReflectionSource
+                    Image {
+                        id: boxFrontReflectionImage
                         anchors.fill: parent
-                        sourceItem: boxFrontImage
-                        hideSource: false
+                        source: videoContent.currentBoxFrontPath
+                        fillMode: Image.PreserveAspectCrop
                         scale: videoContent.reflectionZoomBoxFront
+                        asynchronous: true
 
                         layer.enabled: true
                         layer.effect: FastBlur {
                             radius: 60
                             transparentBorder: true
+                        }
+
+                        onStatusChanged: {
+                            if (status === Image.Error) {
+                                source = "assets/no-image/default.png";
+                            }
+                        }
+
+                        Connections {
+                            target: videoContent
+                            function onCurrentBoxFrontPathChanged() {
+                                boxFrontReflectionImage.source = videoContent.currentBoxFrontPath;
+                            }
                         }
                     }
                 }
@@ -280,6 +294,43 @@ Item {
                     source: videoContent.currentBoxFrontPath
                     fillMode: Image.PreserveAspectFit
 
+                    property real fadeOpacity: 0
+                    property real popScale: 0.96
+                    opacity: fadeOpacity
+                    scale: popScale
+                    transformOrigin: Item.Center
+
+                    ParallelAnimation {
+                        id: boxFrontAppearAnimation
+
+                        NumberAnimation {
+                            target: boxFrontImage
+                            property: "fadeOpacity"
+                            from: 0
+                            to: 1
+                            duration: 400
+                            easing.type: Easing.OutQuad
+                        }
+
+                        NumberAnimation {
+                            target: boxFrontImage
+                            property: "popScale"
+                            from: 0.96
+                            to: 1.0
+                            duration: 400
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    function startFadeIn() {
+                        boxFrontAppearAnimation.stop();
+                        fadeOpacity = 0;
+                        popScale = 0.96;
+                        boxFrontAppearAnimation.start();
+                    }
+
+                    Component.onCompleted: startFadeIn()
+
                     onStatusChanged: {
                         if (status === Image.Error) {
                             videoContent.log("  [BoxFrontBlock] error cargando imagen, usando fallback");
@@ -291,6 +342,7 @@ Item {
                         target: videoContent
                         function onCurrentBoxFrontPathChanged() {
                             boxFrontImage.source = videoContent.currentBoxFrontPath;
+                            boxFrontImage.startFadeIn();
                         }
                     }
                 }
@@ -308,7 +360,7 @@ Item {
             spacing: 20
 
             Text {
-                text: "No hay juegos"
+                text: "There are no games."
                 color: videoContent.palette ? videoContent.palette.textPrimary : "#ffffff"
                 font.pixelSize: (videoContent.parent ? videoContent.parent.width : videoContent.width) * 0.04 * videoContent.fontScale
                 font.family: videoContent.fontFamily
@@ -320,7 +372,6 @@ Item {
 
     GameDetails {
         id: gameDetails
-        height: parent.height * 0.18
         anchors.bottom: parent.bottom
         anchors.bottomMargin: parent.height * 0.05
         anchors.right: parent.right
