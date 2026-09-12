@@ -476,6 +476,12 @@ FocusScope {
         volume: root.sfxVolume / 100
     }
 
+    SoundEffect {
+        id: soundNotice
+        source: "assets/sound/notice.wav"
+        volume: root.sfxVolume / 100
+    }
+
     function playAndLaunch(gameIndex) {
         soundOk.play();
         videoContent.pauseVideo();
@@ -1199,6 +1205,7 @@ FocusScope {
             soundEffectDown: soundDown
             soundEffectOk: soundOk
             soundEffectCancel: soundDown
+            soundEffectNotice: soundNotice
 
             onClosed: {
                 gameList.forceActiveFocus();

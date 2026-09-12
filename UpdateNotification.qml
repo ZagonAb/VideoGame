@@ -23,6 +23,7 @@ FocusScope {
     property var soundEffectDown: null
     property var soundEffectOk: null
     property var soundEffectCancel: null
+    property var soundEffectNotice: null
 
     property string latestVersion: ""
     property string releaseUrl: ""
@@ -43,6 +44,7 @@ FocusScope {
         cardScale = 0.5;
         opacity = 0;
         notification.forceActiveFocus();
+        if (notification.soundEffectNotice) notification.soundEffectNotice.play();
         openAnimation.restart();
         Qt.callLater(function() { viewButton.forceActiveFocus(); });
     }
