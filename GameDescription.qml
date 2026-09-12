@@ -40,10 +40,10 @@ Item {
             width: autoscroll.width
             text: (gameDescriptionContainer.game && gameDescriptionContainer.game.description)
                   ? gameDescriptionContainer.game.description
-                  : "Sin descripción disponible."
+                  : "No description available."
             color: gameDescriptionContainer.palette ? gameDescriptionContainer.palette.textPrimary : "white"
             font.family: gameDescriptionContainer.fontFamily
-            font.pixelSize: Math.max(12, gameDescriptionContainer.width * 0.042 * gameDescriptionContainer.fontScale)
+            font.pixelSize: Math.max(12, gameDescriptionContainer.width * 0.032 * gameDescriptionContainer.fontScale)
             wrapMode: Text.WordWrap
             lineHeight: 1.2
         }

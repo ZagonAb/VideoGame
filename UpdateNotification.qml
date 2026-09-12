@@ -18,13 +18,11 @@ FocusScope {
 
     property string fontFamily: ""
     property var palette: null
-
     property var soundEffectUp: null
     property var soundEffectDown: null
     property var soundEffectOk: null
     property var soundEffectCancel: null
     property var soundEffectNotice: null
-
     property string latestVersion: ""
     property string releaseUrl: ""
     property string releaseNotes: ""

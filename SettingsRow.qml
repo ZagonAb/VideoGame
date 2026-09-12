@@ -11,10 +11,12 @@ Rectangle {
     property var palette: null
     property real panelWidth: width
     property bool showArrows: true
+    property bool rowDisabled: false
 
     height: parent ? parent.height : 40
     radius: 8
     clip: true
+    opacity: row.rowDisabled ? 0.4 : 1.0
     color: active ? (palette ? palette.accent : "#ffffff") : "transparent"
 
     Row {

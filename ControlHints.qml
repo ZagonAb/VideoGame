@@ -1,8 +1,8 @@
 import QtQuick 2.15
 import QtGraphicalEffects 1.12
 
-Row {
-    id: filterRow
+Item {
+    id: filterRoot
 
     property string fontFamily: ""
     property real fontScale: 1.0
@@ -10,16 +10,27 @@ Row {
     property real uiScale: 1.0
     readonly property real iconSizeLarge: 60 * uiScale
     readonly property real iconSizeSmall: 47 * uiScale
+    readonly property real hintFontPixelSize: 28.8 * uiScale * fontScale
 
-    spacing: 15
+    readonly property real fitScale: (width > 0 && content.implicitWidth > 0)
+        ? Math.min(1.0, width / content.implicitWidth)
+        : 1.0
+
+    implicitWidth: content.implicitWidth * fitScale
+    implicitHeight: content.implicitHeight * fitScale
 
     Row {
-        spacing: 5
+        id: content
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        transformOrigin: Item.Left
+        scale: filterRoot.fitScale
+        spacing: 8 * filterRoot.uiScale
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.iconSizeLarge
-            height: filterRow.iconSizeLarge
+            width: filterRoot.iconSizeLarge
+            height: filterRoot.iconSizeLarge
 
             Image {
                 id: lbIcon
@@ -31,14 +42,14 @@ Row {
             ColorOverlay {
                 anchors.fill: lbIcon
                 source: lbIcon
-                color: (filterRow.palette && filterRow.palette.name === "Ice White") ? filterRow.palette.textPrimary : "white"
+                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
             }
         }
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.iconSizeLarge
-            height: filterRow.iconSizeLarge
+            width: filterRoot.iconSizeLarge
+            height: filterRoot.iconSizeLarge
 
             Image {
                 id: rbIcon
@@ -50,22 +61,22 @@ Row {
             ColorOverlay {
                 anchors.fill: rbIcon
                 source: rbIcon
-                color: (filterRow.palette && filterRow.palette.name === "Ice White") ? filterRow.palette.textPrimary : "white"
+                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
             }
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: "FILTER BY LETTER"
-            font.family: filterRow.fontFamily
-            font.pixelSize: filterRow.parent.width * 0.015 * filterRow.fontScale
-            color: filterRow.palette ? filterRow.palette.textPrimary : "white"
+            font.family: filterRoot.fontFamily
+            font.pixelSize: filterRoot.hintFontPixelSize
+            color: filterRoot.palette ? filterRoot.palette.textPrimary : "white"
         }
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.iconSizeSmall
-            height: filterRow.iconSizeSmall
+            width: filterRoot.iconSizeSmall
+            height: filterRoot.iconSizeSmall
 
             Image {
                 id: aIcon
@@ -77,22 +88,22 @@ Row {
             ColorOverlay {
                 anchors.fill: aIcon
                 source: aIcon
-                color: (filterRow.palette && filterRow.palette.name === "Ice White") ? filterRow.palette.textPrimary : "white"
+                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
             }
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: "LAUNCH"
-            font.family: filterRow.fontFamily
-            font.pixelSize: filterRow.parent.width * 0.015 * filterRow.fontScale
-            color: filterRow.palette ? filterRow.palette.textPrimary : "white"
+            font.family: filterRoot.fontFamily
+            font.pixelSize: filterRoot.hintFontPixelSize
+            color: filterRoot.palette ? filterRoot.palette.textPrimary : "white"
         }
 
         Item {
             anchors.verticalCenter: parent.verticalCenter
-            width: filterRow.iconSizeSmall
-            height: filterRow.iconSizeSmall
+            width: filterRoot.iconSizeSmall
+            height: filterRoot.iconSizeSmall
             visible: settingsHintIcon.visible
 
             Image {
@@ -110,16 +121,16 @@ Row {
                 anchors.fill: settingsHintIcon
                 source: settingsHintIcon
                 visible: settingsHintIcon.visible
-                color: (filterRow.palette && filterRow.palette.name === "Ice White") ? filterRow.palette.textPrimary : "white"
+                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
             }
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: "SETTINGS"
-            font.family: filterRow.fontFamily
-            font.pixelSize: filterRow.parent.width * 0.015 * filterRow.fontScale
-            color: filterRow.palette ? filterRow.palette.textPrimary : "white"
+            font.family: filterRoot.fontFamily
+            font.pixelSize: filterRoot.hintFontPixelSize
+            color: filterRoot.palette ? filterRoot.palette.textPrimary : "white"
         }
     }
 }

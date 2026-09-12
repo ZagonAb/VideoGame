@@ -14,7 +14,7 @@ FocusScope {
     height: parent.height
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.3"
+    readonly property string currentVersion: "1.0.4"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -241,6 +241,66 @@ FocusScope {
             background: "#180d05", surface: "#2b1a0d",
             accent: "#c97b3d", accentText: "#180d05",
             textPrimary: "#f2e1cf", textSecondary: "#c9a179"
+        },
+        {
+            name: "Matrix Green",
+            background: "#010a02", surface: "#051506",
+            accent: "#39ff14", accentText: "#010a02",
+            textPrimary: "#d9ffdc", textSecondary: "#7fcf85"
+        },
+        {
+            name: "Royal Purple",
+            background: "#0d0518", surface: "#180a2b",
+            accent: "#9d4edd", accentText: "#ffffff",
+            textPrimary: "#ece0f8", textSecondary: "#b49bc9"
+        },
+        {
+            name: "Coral Reef",
+            background: "#170a08", surface: "#2b1310",
+            accent: "#ff6f61", accentText: "#170a08",
+            textPrimary: "#fbe4e0", textSecondary: "#d19c94"
+        },
+        {
+            name: "Steel Blue",
+            background: "#0b1116", surface: "#141d26",
+            accent: "#4a7a96", accentText: "#ffffff",
+            textPrimary: "#dde7ee", textSecondary: "#8ea3b3"
+        },
+        {
+            name: "Golden Hour",
+            background: "#1a1004", surface: "#2e1c07",
+            accent: "#f4a300", accentText: "#1a1004",
+            textPrimary: "#fbe9c9", textSecondary: "#d1ab6a"
+        },
+        {
+            name: "Cherry Blossom",
+            background: "#fdf2f6", surface: "#ffffff",
+            accent: "#d6336c", accentText: "#ffffff",
+            textPrimary: "#3b1f27", textSecondary: "#8a5468"
+        },
+        {
+            name: "Graphite",
+            background: "#0e0e0e", surface: "#1a1a1a",
+            accent: "#b0b0b0", accentText: "#0e0e0e",
+            textPrimary: "#e6e6e6", textSecondary: "#999999"
+        },
+        {
+            name: "Vampire Red",
+            background: "#0a0000", surface: "#180404",
+            accent: "#8b0000", accentText: "#ffffff",
+            textPrimary: "#f0d6d6", textSecondary: "#a56b6b"
+        },
+        {
+            name: "Arctic Ice",
+            background: "#eaf6fb", surface: "#ffffff",
+            accent: "#00b4d8", accentText: "#002b36",
+            textPrimary: "#06283d", textSecondary: "#47728c"
+        },
+        {
+            name: "Lava Flow",
+            background: "#1a0500", surface: "#2e0a02",
+            accent: "#ff4500", accentText: "#1a0500",
+            textPrimary: "#ffe1d1", textSecondary: "#d1846a"
         }
     ]
 
@@ -251,6 +311,7 @@ FocusScope {
     property int gameDelegateRadius: 5
     property int alphabetDelegateRadius: 50
     property bool videoPlaybackEnabled: true
+    property bool gameDescriptionEnabled: false
     property bool titleMarqueeEnabled: false
     property bool collectionMarqueeEnabled: false
     property int videoVolume: 100
@@ -278,6 +339,13 @@ FocusScope {
             videoPlayback: "Video Playback",
             videoPlaybackOn: "ON",
             videoPlaybackOff: "OFF",
+            gameDescription: "Game Description",
+            gameDescriptionOn: "ON",
+            gameDescriptionOff: "OFF",
+            gameDescriptionAutoOff: "Game Description disabled (16:9 only)",
+            layoutWide: "16:9 Layout",
+            layoutStandard: "4:3 Layout",
+            layoutSquare: "1:1 Layout",
             titleMarquee: "Title Marquee",
             titleMarqueeOn: "ON",
             titleMarqueeOff: "OFF",
@@ -307,6 +375,13 @@ FocusScope {
             videoPlayback: "Reproducción de Video",
             videoPlaybackOn: "Activado",
             videoPlaybackOff: "Desactivado",
+            gameDescription: "Descripción del juego",
+            gameDescriptionOn: "Activado",
+            gameDescriptionOff: "Desactivado",
+            gameDescriptionAutoOff: "Descripción del juego desactivada (solo en 16:9)",
+            layoutWide: "Diseño 16:9",
+            layoutStandard: "Diseño 4:3",
+            layoutSquare: "Diseño 1:1",
             titleMarquee: "Desplazamiento del título",
             titleMarqueeOn: "Activado",
             titleMarqueeOff: "Desactivado",
@@ -335,6 +410,7 @@ FocusScope {
     readonly property int defaultGameDelegateRadius: 5
     readonly property int defaultAlphabetDelegateRadius: 50
     readonly property bool defaultVideoPlaybackEnabled: true
+    readonly property bool defaultGameDescriptionEnabled: false
     readonly property bool defaultTitleMarqueeEnabled: false
     readonly property bool defaultCollectionMarqueeEnabled: false
     readonly property int defaultVideoVolume: 100
@@ -343,6 +419,9 @@ FocusScope {
     readonly property string selectedFontPath: (fontIndex >= 0 && fontIndex < fontsList.length)
         ? fontsList[fontIndex].path : "assets/fonts/bebasneue/bebasneue.ttf"
     readonly property var palette: colorSchemes[colorSchemeIndex]
+
+    readonly property var lightPaletteNames: ["Ice White", "Arctic Ice", "Cherry Blossom"]
+    readonly property bool isLightPalette: palette && lightPaletteNames.indexOf(palette.name) !== -1
 
     function loadSettings() {
         if (api.memory.has("settingsFontIndex")) {
@@ -377,6 +456,10 @@ FocusScope {
             const vpe = api.memory.get("settingsVideoPlaybackEnabled");
             videoPlaybackEnabled = (vpe === true || vpe === "true");
         }
+        if (api.memory.has("settingsGameDescriptionEnabled")) {
+            const gde = api.memory.get("settingsGameDescriptionEnabled");
+            gameDescriptionEnabled = (gde === true || gde === "true");
+        }
         if (api.memory.has("settingsTitleMarqueeEnabled")) {
             const tme = api.memory.get("settingsTitleMarqueeEnabled");
             titleMarqueeEnabled = (tme === true || tme === "true");
@@ -399,6 +482,7 @@ FocusScope {
                      "gameDelegateRadius:", gameDelegateRadius,
                      "alphabetDelegateRadius:", alphabetDelegateRadius,
                      "videoPlaybackEnabled:", videoPlaybackEnabled,
+                     "gameDescriptionEnabled:", gameDescriptionEnabled,
                      "titleMarqueeEnabled:", titleMarqueeEnabled,
                      "collectionMarqueeEnabled:", collectionMarqueeEnabled,
                      "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
@@ -413,6 +497,7 @@ FocusScope {
         api.memory.set("settingsGameDelegateRadius", gameDelegateRadius);
         api.memory.set("settingsAlphabetDelegateRadius", alphabetDelegateRadius);
         api.memory.set("settingsVideoPlaybackEnabled", videoPlaybackEnabled);
+        api.memory.set("settingsGameDescriptionEnabled", gameDescriptionEnabled);
         api.memory.set("settingsTitleMarqueeEnabled", titleMarqueeEnabled);
         api.memory.set("settingsCollectionMarqueeEnabled", collectionMarqueeEnabled);
         api.memory.set("settingsVideoVolume", videoVolume);
@@ -423,6 +508,7 @@ FocusScope {
                      "gameDelegateRadius:", gameDelegateRadius,
                      "alphabetDelegateRadius:", alphabetDelegateRadius,
                      "videoPlaybackEnabled:", videoPlaybackEnabled,
+                     "gameDescriptionEnabled:", gameDescriptionEnabled,
                      "titleMarqueeEnabled:", titleMarqueeEnabled,
                      "collectionMarqueeEnabled:", collectionMarqueeEnabled,
                      "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
@@ -437,6 +523,7 @@ FocusScope {
         gameDelegateRadius = defaultGameDelegateRadius;
         alphabetDelegateRadius = defaultAlphabetDelegateRadius;
         videoPlaybackEnabled = defaultVideoPlaybackEnabled;
+        gameDescriptionEnabled = defaultGameDescriptionEnabled;
         titleMarqueeEnabled = defaultTitleMarqueeEnabled;
         collectionMarqueeEnabled = defaultCollectionMarqueeEnabled;
         videoVolume = defaultVideoVolume;
@@ -445,6 +532,7 @@ FocusScope {
         settingsOverlay.syncValues(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                                     titleCollectionSpacing, gameDelegateRadius,
                                     alphabetDelegateRadius, videoPlaybackEnabled,
+                                    gameDescriptionEnabled,
                                     titleMarqueeEnabled, collectionMarqueeEnabled,
                                     videoVolume, sfxVolume);
         console.log("[settings] reset to defaults");
@@ -454,6 +542,7 @@ FocusScope {
         settingsOverlay.open(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                               titleCollectionSpacing, gameDelegateRadius,
                               alphabetDelegateRadius, videoPlaybackEnabled,
+                              gameDescriptionEnabled,
                               titleMarqueeEnabled, collectionMarqueeEnabled,
                               videoVolume, sfxVolume);
     }
@@ -685,27 +774,78 @@ FocusScope {
     }
 
     readonly property real aspectRatio: root.height > 0 ? (root.width / root.height) : 1.777
+    readonly property real wideThreshold: 1.60
+    readonly property real standardThreshold: 1.20
 
     readonly property string layoutMode: {
-        if (aspectRatio >= 1.55) return "wide";
-        if (aspectRatio >= 1.15) return "standard";
+        if (aspectRatio >= wideThreshold) return "wide";
+        if (aspectRatio >= standardThreshold) return "standard";
         return "square";
+    }
+    readonly property real standardRefAspect: 4 / 3
+    readonly property real wideRefAspect: 16 / 9
+
+    readonly property real layoutFactor: Math.max(0.0, Math.min(1.0,
+        (aspectRatio - standardRefAspect) / (wideRefAspect - standardRefAspect)
+    ))
+
+    readonly property real gameListWidthRatioMin: 0.46
+    readonly property real gameListWidthRatioMax: 0.40
+    readonly property real videoWidthRatioMin: 0.50
+    readonly property real videoWidthRatioMax: 2 / 3.5
+
+    readonly property real gameListWidthRatio: gameListWidthRatioMin
+        + (gameListWidthRatioMax - gameListWidthRatioMin) * layoutFactor
+    readonly property real videoWidthRatio: videoWidthRatioMin
+        + (videoWidthRatioMax - videoWidthRatioMin) * layoutFactor
+
+    readonly property bool showGameDescription: root.gameDescriptionEnabled && root.layoutMode === "wide"
+    property string _previousLayoutMode: ""
+
+    function layoutModeLabel(mode) {
+        if (mode === "wide") return root.strings.layoutWide;
+        if (mode === "standard") return root.strings.layoutStandard;
+        return root.strings.layoutSquare;
+    }
+
+    onLayoutModeChanged: {
+        const previous = root._previousLayoutMode;
+        const current = root.layoutMode;
+        root._previousLayoutMode = current;
+        if (!previous || previous === current) return;
+
+        console.log("[layout] aspect ratio changed:", previous, "->", current);
+
+        let forcedOff = false;
+        if (previous === "wide" && current !== "wide" && root.gameDescriptionEnabled) {
+            root.gameDescriptionEnabled = false;
+            root.saveSettings();
+            settingsOverlay.gameDescriptionValue = false;
+            forcedOff = true;
+            console.log("[layout] Game Description auto-disabled (left 16:9)");
+        }
+
+        let message = root.layoutModeLabel(current);
+        if (forcedOff) {
+            message += "\n" + root.strings.gameDescriptionAutoOff;
+        }
+        aspectRatioNotice.show(message);
     }
 
     readonly property real referenceMinSide: 1080
-    readonly property real uiScale: Math.min(root.width, root.height) / referenceMinSide
+    readonly property real uiScaleMin: 0.65
+    readonly property real uiScaleMax: 1.5
+    readonly property real uiScale: Math.max(uiScaleMin, Math.min(uiScaleMax,
+        Math.min(root.width, root.height) / referenceMinSide
+    ))
     readonly property real alphabetSelectorWidth: 50 * uiScale
-    readonly property real headerIconSize: 45 * uiScale
+    readonly property real headerIconSize: 32 * uiScale
+    readonly property real headerFontPixelSize: 38.4 * uiScale * fontScale
 
     readonly property var layoutProfiles: ({
-        wide: {
-            gameListWidthFn: function() { return root.width / 2.5 - alphabetSelector.width; },
-            videoWidthFn: function() { return root.width * 2 / 3.5; },
-            videoHeightFn: function() { return root.height; }
-        },
-        standard: {
-            gameListWidthFn: function() { return root.width * 0.46 - alphabetSelector.width; },
-            videoWidthFn: function() { return root.width * 0.50; },
+        wideStandard: {
+            gameListWidthFn: function() { return root.width * root.gameListWidthRatio - alphabetSelector.width; },
+            videoWidthFn: function() { return root.width * root.videoWidthRatio; },
             videoHeightFn: function() { return root.height; }
         },
         square: {
@@ -715,7 +855,9 @@ FocusScope {
         }
     })
 
-    readonly property var currentProfile: layoutProfiles[layoutMode]
+    readonly property var currentProfile: layoutMode === "square"
+        ? layoutProfiles.square
+        : layoutProfiles.wideStandard
 
     FontLoader {
         id: fontLoader
@@ -785,7 +927,7 @@ FocusScope {
                 ColorOverlay {
                     anchors.fill: headerIcon
                     source: headerIcon
-                    color: (root.palette && root.palette.name === "Ice White") ? root.palette.textPrimary : "white"
+                    color: root.isLightPalette ? root.palette.textPrimary : "white"
                 }
             }
 
@@ -794,8 +936,9 @@ FocusScope {
                 text: "VIDEO GAMES"
                 font.underline: true
                 font.family: fontLoader.name
-                font.pixelSize: root.width * 0.020 * root.fontScale
+                font.pixelSize: root.headerFontPixelSize
                 color: root.palette.textPrimary
+                font.bold: true
             }
         }
 
@@ -888,10 +1031,12 @@ FocusScope {
         VideoContent {
             id: videoContent
             width: root.currentProfile.videoWidthFn()
-            height: root.currentProfile.videoHeightFn()
+            height: root.showGameDescription
+                    ? gameList.height * 0.7
+                    : root.currentProfile.videoHeightFn()
             anchors.right: parent.right
-            anchors.top: root.layoutMode === "square" ? gameList.top : undefined
-            anchors.verticalCenter: root.layoutMode === "square" ? undefined : parent.verticalCenter
+            anchors.top: (root.layoutMode === "square" || root.showGameDescription) ? gameList.top : undefined
+            anchors.verticalCenter: (root.layoutMode === "square" || root.showGameDescription) ? undefined : parent.verticalCenter
             game: root.game
             fontFamily: fontLoader.name
             fontScale: root.fontScale
@@ -910,9 +1055,9 @@ FocusScope {
 
         GameDescription {
             id: gameDescriptionPanel
-            visible: root.layoutMode === "square"
+            visible: root.layoutMode === "square" || root.showGameDescription
             width: videoContent.width
-            height: root.layoutMode === "square"
+            height: (root.layoutMode === "square" || root.showGameDescription)
                     ? Math.max(0, gameList.height - videoContent.height - 10)
                     : 0
             anchors.right: parent.right
@@ -1121,6 +1266,7 @@ FocusScope {
             palette: root.palette
             languages: root.languages
             strings: root.strings
+            gameDescriptionAvailable: root.layoutMode === "wide"
 
             onFontPicked: function(index) {
                 root.fontIndex = index;
@@ -1161,6 +1307,14 @@ FocusScope {
                 console.log("[settings] Video Playback picked ->", value,
                              "| juego actual:", root.game ? root.game.title : "null");
                 root.videoPlaybackEnabled = value;
+                root.saveSettings();
+            }
+
+            onGameDescriptionPicked: function(value) {
+                if (value && root.layoutMode !== "wide") {
+                    return;
+                }
+                root.gameDescriptionEnabled = value;
                 root.saveSettings();
             }
 
@@ -1211,14 +1365,31 @@ FocusScope {
                 gameList.forceActiveFocus();
             }
         }
+
+        AspectRatioNotice {
+            id: aspectRatioNotice
+            fontFamily: fontLoader.name
+            fontScale: root.fontScale
+            palette: root.palette
+            z: 2600
+        }
     }
 
     Component.onCompleted: {
         console.log("[persist] root.onCompleted -> scheduling restoreState() via Qt.callLater");
         console.log("[layout] aspectRatio:", aspectRatio.toFixed(3),
                      "layoutMode:", layoutMode,
+                     "layoutFactor:", layoutFactor.toFixed(3),
+                     "gameListWidthRatio:", gameListWidthRatio.toFixed(3),
+                     "videoWidthRatio:", videoWidthRatio.toFixed(3),
                      "uiScale:", uiScale.toFixed(3));
         root.loadSettings();
+        if (root.gameDescriptionEnabled && root.layoutMode !== "wide") {
+            console.log("[settings] Game Description was ON but layout isn't 16:9 at startup -> forcing OFF");
+            root.gameDescriptionEnabled = false;
+            root.saveSettings();
+        }
+        root._previousLayoutMode = root.layoutMode;
         Qt.callLater(root.restoreState);
         Qt.callLater(root.checkForUpdates);
     }
