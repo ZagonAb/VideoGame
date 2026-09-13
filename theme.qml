@@ -327,7 +327,6 @@ FocusScope {
         { code: "es", name: "Español" }
     ]
     property int languageIndex: 0
-
     readonly property string language: (languageIndex >= 0 && languageIndex < languages.length)
         ? languages[languageIndex].code : "en"
 

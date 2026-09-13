@@ -42,7 +42,6 @@ Item {
                 source: "assets/icons/lb.svg"
                 mipmap: true
             }
-
             ColorOverlay {
                 anchors.fill: lbIcon
                 source: lbIcon
