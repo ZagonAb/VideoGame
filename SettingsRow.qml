@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import QtGraphicalEffects 1.15
 
 Rectangle {
     id: row
@@ -40,16 +41,45 @@ Rectangle {
                 : (row.palette ? row.palette.textPrimary : "white")
         }
 
-        Text {
+        Item {
+            id: leftArrowContainer
             visible: row.showArrows
-            text: "◀"
+            width: row.panelWidth * 0.04 * row.fontScale
+            height: width
             anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: row.panelWidth * 0.04 * row.fontScale
-            fontSizeMode: Text.Fit
-            minimumPixelSize: 10
-            color: row.active
-                ? (row.palette ? row.palette.accentText : "black")
-                : (row.palette ? row.palette.textSecondary : "#aaaaaa")
+
+            Image {
+                id: leftArrowIcon
+                anchors.fill: parent
+                source: "assets/icons/left-arrow.svg"
+                fillMode: Image.PreserveAspectFit
+                sourceSize.width: width
+                sourceSize.height: height
+                asynchronous: true
+                cache: true
+                visible: status === Image.Ready
+            }
+
+            ColorOverlay {
+                anchors.fill: leftArrowIcon
+                source: leftArrowIcon
+                visible: leftArrowIcon.status === Image.Ready
+                color: row.active
+                    ? (row.palette ? row.palette.accentText : "black")
+                    : (row.palette ? row.palette.textSecondary : "#aaaaaa")
+            }
+
+            Text {
+                anchors.centerIn: parent
+                text: "◀"
+                visible: leftArrowIcon.status === Image.Error || leftArrowIcon.status === Image.Null
+                font.pixelSize: row.panelWidth * 0.04 * row.fontScale
+                fontSizeMode: Text.Fit
+                minimumPixelSize: 10
+                color: row.active
+                    ? (row.palette ? row.palette.accentText : "black")
+                    : (row.palette ? row.palette.textSecondary : "#aaaaaa")
+            }
         }
 
         Text {
@@ -70,16 +100,45 @@ Rectangle {
                 : (row.palette ? row.palette.textPrimary : "white")
         }
 
-        Text {
+        Item {
+            id: rightArrowContainer
             visible: row.showArrows
-            text: "▶"
+            width: row.panelWidth * 0.04 * row.fontScale
+            height: width
             anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: row.panelWidth * 0.04 * row.fontScale
-            fontSizeMode: Text.Fit
-            minimumPixelSize: 10
-            color: row.active
-                ? (row.palette ? row.palette.accentText : "black")
-                : (row.palette ? row.palette.textSecondary : "#aaaaaa")
+
+            Image {
+                id: rightArrowIcon
+                anchors.fill: parent
+                source: "assets/icons/right-arrow.svg"
+                fillMode: Image.PreserveAspectFit
+                sourceSize.width: width
+                sourceSize.height: height
+                asynchronous: true
+                cache: true
+                visible: status === Image.Ready
+            }
+
+            ColorOverlay {
+                anchors.fill: rightArrowIcon
+                source: rightArrowIcon
+                visible: rightArrowIcon.status === Image.Ready
+                color: row.active
+                    ? (row.palette ? row.palette.accentText : "black")
+                    : (row.palette ? row.palette.textSecondary : "#aaaaaa")
+            }
+
+            Text {
+                anchors.centerIn: parent
+                text: "▶"
+                visible: rightArrowIcon.status === Image.Error || rightArrowIcon.status === Image.Null
+                font.pixelSize: row.panelWidth * 0.04 * row.fontScale
+                fontSizeMode: Text.Fit
+                minimumPixelSize: 10
+                color: row.active
+                    ? (row.palette ? row.palette.accentText : "black")
+                    : (row.palette ? row.palette.textSecondary : "#aaaaaa")
+            }
         }
     }
 }

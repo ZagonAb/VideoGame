@@ -15,7 +15,9 @@
 
 ![screen1](https://github.com/ZagonAb/VideoGame/blob/bf91b993884c2f4d766dd620219512c2da8f1b3a/.meta/screenshots/screen4.png)
 
+## Third-party fonts and licenses
 
+This project includes several third-party fonts. Each font is subject to its own license. The full texts of the licenses are included in the corresponding files within the project.
 
 ## Installation
 
