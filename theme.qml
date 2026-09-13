@@ -14,7 +14,7 @@ FocusScope {
     height: parent.height
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.4"
+    readonly property string currentVersion: "1.0.5"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -142,7 +142,12 @@ FocusScope {
         { name: "Sekuya", path: "assets/fonts/sekuya/sekuya.ttf" },
         { name: "Slabo 27px", path: "assets/fonts/slabo27px/slabo27px.ttf" },
         { name: "Tajawal", path: "assets/fonts/tajawal/tajawal.ttf" },
-        { name: "Titillium Web", path: "assets/fonts/titillium/titillium.ttf" }
+        { name: "Titillium Web", path: "assets/fonts/titillium/titillium.ttf" },
+        { name: "Anonymous", path: "assets/fonts/anonymous/anonymous.ttf" },
+        { name: "Noto Sans", path: "assets/fonts/noto-sans/noto-sans.ttf" },
+        { name: "Roboto", path: "assets/fonts/roboto/roboto.ttf" },
+        { name: "Terminus", path: "assets/fonts/terminus/terminus.ttf" },
+        { name: "Ubuntu", path: "assets/fonts/ubuntu/ubuntu.ttf" }
     ]
 
     property var colorSchemes: [
@@ -839,8 +844,8 @@ FocusScope {
         Math.min(root.width, root.height) / referenceMinSide
     ))
     readonly property real alphabetSelectorWidth: 50 * uiScale
-    readonly property real headerIconSize: 32 * uiScale
-    readonly property real headerFontPixelSize: 38.4 * uiScale * fontScale
+    readonly property real headerIconSize: vpx(44) * uiScale * fontScale
+    readonly property real headerFontPixelSize: vpx(44) * uiScale * fontScale
 
     readonly property var layoutProfiles: ({
         wideStandard: {
@@ -1185,7 +1190,7 @@ FocusScope {
                 smooth: true
                 opacity: 0
                 scale: 0.35
-                visible: source !== "" && status !== Image.Error
+                visible: source !== "" && status === Image.Ready
             }
 
             Text {

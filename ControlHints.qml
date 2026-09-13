@@ -12,6 +12,10 @@ Item {
     readonly property real iconSizeSmall: 47 * uiScale
     readonly property real hintFontPixelSize: 28.8 * uiScale * fontScale
 
+    readonly property var lightThemeNames: ["Ice White", "Cherry Blossom", "Arctic Ice"]
+    readonly property bool isLightTheme: filterRoot.palette && filterRoot.lightThemeNames.indexOf(filterRoot.palette.name) !== -1
+    readonly property color iconColor: filterRoot.isLightTheme ? filterRoot.palette.textPrimary : "white"
+
     readonly property real fitScale: (width > 0 && content.implicitWidth > 0)
         ? Math.min(1.0, width / content.implicitWidth)
         : 1.0
@@ -42,7 +46,7 @@ Item {
             ColorOverlay {
                 anchors.fill: lbIcon
                 source: lbIcon
-                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
+                color: filterRoot.iconColor
             }
         }
 
@@ -61,7 +65,7 @@ Item {
             ColorOverlay {
                 anchors.fill: rbIcon
                 source: rbIcon
-                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
+                color: filterRoot.iconColor
             }
         }
 
@@ -88,7 +92,7 @@ Item {
             ColorOverlay {
                 anchors.fill: aIcon
                 source: aIcon
-                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
+                color: filterRoot.iconColor
             }
         }
 
@@ -121,7 +125,7 @@ Item {
                 anchors.fill: settingsHintIcon
                 source: settingsHintIcon
                 visible: settingsHintIcon.visible
-                color: (filterRoot.palette && filterRoot.palette.name === "Ice White") ? filterRoot.palette.textPrimary : "white"
+                color: filterRoot.iconColor
             }
         }
 
