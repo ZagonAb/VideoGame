@@ -69,7 +69,7 @@ FocusScope {
             ? Math.min(parent.width * 0.82, 860)
             : Math.min(parent.width * 0.5, 640)
         height: column.height + margin * 2
-        radius: 14
+        radius: vpx(5)
         clip: true
         color: notification.palette ? notification.palette.surface : "#111111"
         border.color: notification.palette ? notification.palette.accent : "#ffffff"
@@ -125,7 +125,7 @@ FocusScope {
                     id: viewButton
                     width: column.width * 0.3
                     height: card.width * 0.08
-                    radius: 8
+                    radius: vpx(5)
                     color: activeFocus
                         ? (notification.palette ? notification.palette.accent : "#ffffff")
                         : "transparent"
@@ -177,7 +177,7 @@ FocusScope {
                     id: openButton
                     width: column.width * 0.34
                     height: card.width * 0.08
-                    radius: 8
+                    radius: vpx(5)
                     color: activeFocus
                         ? (notification.palette ? notification.palette.accent : "#ffffff")
                         : "transparent"
@@ -234,7 +234,7 @@ FocusScope {
                     id: closeButton
                     width: column.width * 0.24
                     height: card.width * 0.08
-                    radius: 8
+                    radius: vpx(5)
                     color: activeFocus
                         ? (notification.palette ? notification.palette.accent : "#ffffff")
                         : "transparent"

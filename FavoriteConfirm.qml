@@ -8,6 +8,9 @@ FocusScope {
     property real fontScale: 1.0
     property var palette: null
     property var strings: ({})
+    property var soundNavigate: null
+    property var soundOpen: null
+    property var soundCancel: null
 
     signal confirmed()
     signal cancelled()
@@ -33,28 +36,38 @@ FocusScope {
         focusIndex = 0;
         favoriteConfirm.forceActiveFocus();
         showAnim.restart();
+        if (soundOpen) soundOpen.play();
     }
 
     function close() {
         hideAnim.restart();
     }
 
+    function doCancel() {
+        favoriteConfirm.close();
+        if (soundCancel) soundCancel.play();
+        favoriteConfirm.cancelled();
+    }
+
+    function doConfirm() {
+        favoriteConfirm.close();
+        favoriteConfirm.confirmed();
+    }
+
     Keys.onPressed: function(event) {
         event.accepted = true;
         if (event.key === Qt.Key_Left || event.key === Qt.Key_Right) {
             focusIndex = focusIndex === 0 ? 1 : 0;
+            if (soundNavigate) soundNavigate.play();
         }
         else if (api.keys.isCancel(event)) {
-            favoriteConfirm.close();
-            favoriteConfirm.cancelled();
+            favoriteConfirm.doCancel();
         }
         else if (api.keys.isAccept(event)) {
             if (focusIndex === 1) {
-                favoriteConfirm.close();
-                favoriteConfirm.confirmed();
+                favoriteConfirm.doConfirm();
             } else {
-                favoriteConfirm.close();
-                favoriteConfirm.cancelled();
+                favoriteConfirm.doCancel();
             }
         }
     }
@@ -87,7 +100,7 @@ FocusScope {
             id: cardColumn
             anchors.centerIn: parent
             width: parent.width * 0.85
-            spacing: parent.height * 0.06
+            spacing: favoriteConfirm.height * 0.03
 
             Text {
                 width: parent.width
@@ -128,10 +141,7 @@ FocusScope {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: {
-                            favoriteConfirm.close();
-                            favoriteConfirm.cancelled();
-                        }
+                        onClicked: favoriteConfirm.doCancel()
                     }
                 }
 
@@ -159,10 +169,7 @@ FocusScope {
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: {
-                            favoriteConfirm.close();
-                            favoriteConfirm.confirmed();
-                        }
+                        onClicked: favoriteConfirm.doConfirm()
                     }
                 }
             }

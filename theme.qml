@@ -623,7 +623,7 @@ FocusScope {
 
     Timer {
         id: idleTimer
-        interval: 90000
+        interval: 45000
         repeat: false
         onTriggered: root.enterAttractMode()
     }
@@ -1557,6 +1557,9 @@ FocusScope {
             fontScale: root.fontScale
             palette: root.palette
             strings: root.strings
+            soundNavigate: soundUp
+            soundOpen: soundOk
+            soundCancel: soundDown
 
             onConfirmed: {
                 root.toggleFavorite();
