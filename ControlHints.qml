@@ -11,7 +11,6 @@ Item {
     readonly property real iconSizeLarge: 60 * uiScale
     readonly property real iconSizeSmall: 47 * uiScale
     readonly property real hintFontPixelSize: 28.8 * uiScale * fontScale
-
     readonly property var lightThemeNames: ["Ice White", "Cherry Blossom", "Arctic Ice"]
     readonly property bool isLightTheme: filterRoot.palette && filterRoot.lightThemeNames.indexOf(filterRoot.palette.name) !== -1
     readonly property color iconColor: filterRoot.isLightTheme ? filterRoot.palette.textPrimary : "white"
@@ -98,6 +97,40 @@ Item {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: "LAUNCH"
+            font.family: filterRoot.fontFamily
+            font.pixelSize: filterRoot.hintFontPixelSize
+            color: filterRoot.palette ? filterRoot.palette.textPrimary : "white"
+        }
+
+        Item {
+            anchors.verticalCenter: parent.verticalCenter
+            width: filterRoot.iconSizeSmall
+            height: filterRoot.iconSizeSmall
+            visible: favoriteHintIcon.visible
+
+            Image {
+                id: favoriteHintIcon
+                anchors.fill: parent
+                source: "assets/icons/x.svg"
+                mipmap: true
+                visible: status !== Image.Error
+                onStatusChanged: {
+                    if (status === Image.Error) visible = false;
+                }
+            }
+
+            ColorOverlay {
+                anchors.fill: favoriteHintIcon
+                source: favoriteHintIcon
+                visible: favoriteHintIcon.visible
+                color: filterRoot.iconColor
+            }
+        }
+
+        Text {
+            visible: favoriteHintIcon.visible
+            anchors.verticalCenter: parent.verticalCenter
+            text: "FAVORITE"
             font.family: filterRoot.fontFamily
             font.pixelSize: filterRoot.hintFontPixelSize
             color: filterRoot.palette ? filterRoot.palette.textPrimary : "white"

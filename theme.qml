@@ -13,8 +13,15 @@ FocusScope {
     width: parent.width
     height: parent.height
 
+    Keys.onPressed: function(event) {
+        if (root.attractModeActive) {
+            event.accepted = true;
+            root.exitAttractMode();
+        }
+    }
+
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.5"
+    readonly property string currentVersion: "1.0.6"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -77,6 +84,7 @@ FocusScope {
         repeat: false
         onTriggered: {
             if (root._pendingUpdateVersion !== "") {
+                root.stopIdleWatch();
                 updateNotification.show(root._pendingUpdateVersion, root._pendingUpdateUrl, root._pendingUpdateNotes);
                 root._pendingUpdateVersion = "";
                 root._pendingUpdateUrl = "";
@@ -321,6 +329,8 @@ FocusScope {
     property bool collectionMarqueeEnabled: false
     property int videoVolume: 100
     property int sfxVolume: 100
+    property bool attractModeEnabled: false
+    property bool attractModeActive: false
 
     property var languages: [
         { code: "en", name: "English" },
@@ -358,6 +368,14 @@ FocusScope {
             collectionMarqueeOff: "OFF",
             videoVolume: "Video Volume",
             sfxVolume: "Sound Effects Volume",
+            attractMode: "Attract Mode",
+            attractModeOn: "ON",
+            attractModeOff: "OFF",
+            attractBadge: "ATTRACT MODE",
+            attractHint: "Press any button to browse",
+            favRemoveTitle: "Remove \"%1\" from Favorites?",
+            favRemoveCancel: "Cancel",
+            favRemoveConfirm: "Remove",
             reset: "Reset to Default",
             hint: "\u2191\u2193 Navigate    \u2190\u2192 Change / Reset    B Close",
             updateTitle: "New Update Available",
@@ -394,6 +412,14 @@ FocusScope {
             collectionMarqueeOff: "Desactivado",
             videoVolume: "Volumen de video",
             sfxVolume: "Volumen de efectos de sonido",
+            attractMode: "Modo Attract",
+            attractModeOn: "Activado",
+            attractModeOff: "Desactivado",
+            attractBadge: "MODO ATTRACT",
+            attractHint: "Presiona cualquier botón para volver",
+            favRemoveTitle: "¿Quitar \"%1\" de Favoritos?",
+            favRemoveCancel: "Cancelar",
+            favRemoveConfirm: "Quitar",
             reset: "Restaurar valores por defecto",
             hint: "\u2191\u2193 Navegar    \u2190\u2192 Cambiar / Restaurar    B Cerrar",
             updateTitle: "Nueva actualización disponible",
@@ -419,6 +445,7 @@ FocusScope {
     readonly property bool defaultCollectionMarqueeEnabled: false
     readonly property int defaultVideoVolume: 100
     readonly property int defaultSfxVolume: 100
+    readonly property bool defaultAttractModeEnabled: false
 
     readonly property string selectedFontPath: (fontIndex >= 0 && fontIndex < fontsList.length)
         ? fontsList[fontIndex].path : "assets/fonts/bebasneue/bebasneue.ttf"
@@ -480,6 +507,10 @@ FocusScope {
             const sv = api.memory.get("settingsSfxVolume");
             if (sv >= 0 && sv <= 100) sfxVolume = sv;
         }
+        if (api.memory.has("settingsAttractModeEnabled")) {
+            const ame = api.memory.get("settingsAttractModeEnabled");
+            attractModeEnabled = (ame === true || ame === "true");
+        }
         console.log("[settings] loaded -> fontIndex:", fontIndex, "fontScale:", fontScale,
                      "colorSchemeIndex:", colorSchemeIndex, "languageIndex:", languageIndex,
                      "titleCollectionSpacing:", titleCollectionSpacing,
@@ -489,7 +520,8 @@ FocusScope {
                      "gameDescriptionEnabled:", gameDescriptionEnabled,
                      "titleMarqueeEnabled:", titleMarqueeEnabled,
                      "collectionMarqueeEnabled:", collectionMarqueeEnabled,
-                     "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
+                     "videoVolume:", videoVolume, "sfxVolume:", sfxVolume,
+                     "attractModeEnabled:", attractModeEnabled);
     }
 
     function saveSettings() {
@@ -506,6 +538,7 @@ FocusScope {
         api.memory.set("settingsCollectionMarqueeEnabled", collectionMarqueeEnabled);
         api.memory.set("settingsVideoVolume", videoVolume);
         api.memory.set("settingsSfxVolume", sfxVolume);
+        api.memory.set("settingsAttractModeEnabled", attractModeEnabled);
         console.log("[settings] saved -> fontIndex:", fontIndex, "fontScale:", fontScale,
                      "colorSchemeIndex:", colorSchemeIndex, "languageIndex:", languageIndex,
                      "titleCollectionSpacing:", titleCollectionSpacing,
@@ -515,7 +548,8 @@ FocusScope {
                      "gameDescriptionEnabled:", gameDescriptionEnabled,
                      "titleMarqueeEnabled:", titleMarqueeEnabled,
                      "collectionMarqueeEnabled:", collectionMarqueeEnabled,
-                     "videoVolume:", videoVolume, "sfxVolume:", sfxVolume);
+                     "videoVolume:", videoVolume, "sfxVolume:", sfxVolume,
+                     "attractModeEnabled:", attractModeEnabled);
     }
 
     function resetSettingsToDefault() {
@@ -532,23 +566,66 @@ FocusScope {
         collectionMarqueeEnabled = defaultCollectionMarqueeEnabled;
         videoVolume = defaultVideoVolume;
         sfxVolume = defaultSfxVolume;
+        attractModeEnabled = defaultAttractModeEnabled;
         saveSettings();
         settingsOverlay.syncValues(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                                     titleCollectionSpacing, gameDelegateRadius,
                                     alphabetDelegateRadius, videoPlaybackEnabled,
                                     gameDescriptionEnabled,
                                     titleMarqueeEnabled, collectionMarqueeEnabled,
-                                    videoVolume, sfxVolume);
+                                    videoVolume, sfxVolume, attractModeEnabled);
         console.log("[settings] reset to defaults");
     }
 
     function openSettings() {
+        root.stopIdleWatch();
         settingsOverlay.open(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                               titleCollectionSpacing, gameDelegateRadius,
                               alphabetDelegateRadius, videoPlaybackEnabled,
                               gameDescriptionEnabled,
                               titleMarqueeEnabled, collectionMarqueeEnabled,
-                              videoVolume, sfxVolume);
+                              videoVolume, sfxVolume, attractModeEnabled);
+    }
+
+    function startIdleWatch() {
+        if (root.attractModeEnabled) {
+            idleTimer.restart();
+        } else {
+            idleTimer.stop();
+        }
+    }
+
+    function stopIdleWatch() {
+        idleTimer.stop();
+    }
+
+    function pokeActivity() {
+        if (!root.attractModeEnabled) return;
+        if (root.attractModeActive) return;
+        idleTimer.restart();
+    }
+
+    function enterAttractMode() {
+        if (!root.attractModeEnabled) return;
+        if (root.attractModeActive) return;
+        if (api.allGames.count <= 0) return;
+        console.log("[attract] entering attract mode");
+        root.attractModeActive = true;
+        attractOverlay.start();
+    }
+
+    function exitAttractMode() {
+        console.log("[attract] exiting attract mode");
+        root.attractModeActive = false;
+        gameList.forceActiveFocus();
+        root.pokeActivity();
+    }
+
+    Timer {
+        id: idleTimer
+        interval: 90000
+        repeat: false
+        onTriggered: root.enterAttractMode()
     }
 
     SoundEffect {
@@ -576,6 +653,7 @@ FocusScope {
     }
 
     function playAndLaunch(gameIndex) {
+        root.stopIdleWatch();
         soundOk.play();
         videoContent.pauseVideo();
         pendingLaunchIndex = gameIndex;
@@ -605,6 +683,29 @@ FocusScope {
     function collectionNameOf(gameObject) {
         return (gameObject && gameObject.collections && gameObject.collections.count > 0)
             ? gameObject.collections.get(0).name : "";
+    }
+
+    function toggleFavorite() {
+        if (!gameList.currentItem || !gameList.currentItem.game) {
+            console.log("[favorites] toggleFavorite abortado, no hay currentItem/game");
+            return;
+        }
+        const g = gameList.currentItem.game;
+        g.favorite = !g.favorite;
+        console.log("[favorites] toggled ->", g.title, "favorite:", g.favorite);
+        alphabetSelector.updateAvailableLetters();
+        if (soundOk) soundOk.play();
+    }
+
+    function requestToggleFavorite() {
+        if (!gameList.currentItem || !gameList.currentItem.game) return;
+        const g = gameList.currentItem.game;
+        if (root.currentFilter === "Fav" && g.favorite) {
+            root.stopIdleWatch();
+            favoriteConfirmOverlay.open(g.title);
+        } else {
+            root.toggleFavorite();
+        }
     }
 
     function saveState() {
@@ -733,15 +834,24 @@ FocusScope {
         id: filteredGames
         sourceModel: api.allGames
         sorters: RoleSorter { roleName: "title" }
-        filterRoleName: "title"
-        filterRegExp: /^.*/
+        filters: [
+            ValueFilter {
+                id: favoriteFilterRule
+                roleName: "favorite"
+                value: true
+                enabled: root.currentFilter === "Fav"
+            },
+            RegExpFilter {
+                id: titleFilterRule
+                roleName: "title"
+                pattern: (root.currentFilter === "All" || root.currentFilter === "Fav")
+                    ? "^.*" : ("^" + root.currentFilter)
+                caseSensitivity: Qt.CaseInsensitive
+                enabled: root.currentFilter !== "Fav"
+            }
+        ]
 
         function updateFilter() {
-            if (currentFilter === "All") {
-                filterRegExp = /^.*/;
-            } else {
-                filterRegExp = new RegExp("^" + currentFilter, "i");
-            }
             root.updateSelectedGame();
         }
 
@@ -893,6 +1003,7 @@ FocusScope {
             gameModel: api.allGames
 
             onLetterSelected: function(letter, index) {
+                root.pokeActivity();
                 currentFilter = letter;
                 filteredGames.updateFilter();
             }
@@ -964,6 +1075,9 @@ FocusScope {
             soundEffectUp: soundUp
             soundEffectDown: soundDown
             subFilterEnabled: root.currentFilter !== "All"
+            attractModeActive: root.attractModeActive
+
+            onAttractExitRequested: root.exitAttractMode()
 
             onGameSelected: function(index) {
                 videoEnded = false;
@@ -981,6 +1095,12 @@ FocusScope {
             }
 
             Keys.onPressed: function(event) {
+                if (root.attractModeActive) {
+                    event.accepted = true;
+                    root.exitAttractMode();
+                    return;
+                }
+                root.pokeActivity();
                 if (!event.isAutoRepeat) {
                     if (api.keys.isAccept(event)) {
                         root.playAndLaunch(currentIndex);
@@ -1000,6 +1120,14 @@ FocusScope {
                         root.openSettings();
                         event.accepted = true;
                     }
+                    else if (api.keys.isDetails(event) || event.key === Qt.Key_F) {
+                        root.requestToggleFavorite();
+                        event.accepted = true;
+                    }
+                    else {
+                        console.log("[keys] unhandled key pressed -> event.key:", event.key,
+                                     "text:", event.text, "modifiers:", event.modifiers);
+                    }
                 }
             }
 
@@ -1012,6 +1140,7 @@ FocusScope {
             Connections {
                 target: gameList
                 function onCurrentIndexChanged() {
+                    root.pokeActivity();
                     console.log("[persist] gameList.currentIndex changed ->", gameList.currentIndex,
                                  "(filteredGames.count:", filteredGames.count, ")");
                 }
@@ -1169,10 +1298,12 @@ FocusScope {
 
             property string logoSource: ""
             property string gameTitle: ""
+            property string collectionName: ""
 
             function trigger(game) {
                 logoSource = (game && game.assets) ? (game.assets.logo || game.assets.marquee || "") : "";
                 gameTitle = game ? game.title : "";
+                collectionName = game ? root.collectionNameOf(game) : "";
                 launchLogo.scale = 0.35;
                 launchLogo.opacity = 0;
                 opacity = 0;
@@ -1213,6 +1344,30 @@ FocusScope {
                     samples: 32
                     color: "black"
                     spread: 0.4
+                }
+            }
+
+            Text {
+                id: launchCollectionText
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: launchLogo.visible ? launchLogo.bottom : launchTitleFallback.bottom
+                anchors.topMargin: parent.height * 0.03
+                width: parent.width * 0.7
+                text: launchOverlay.collectionName
+                visible: launchOverlay.collectionName !== ""
+                opacity: launchLogo.opacity
+                color: root.palette.textSecondary
+                font.family: fontLoader.name
+                font.pixelSize: root.width * 0.02 * root.fontScale
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    radius: 16
+                    samples: 24
+                    color: "black"
+                    spread: 0.3
                 }
             }
 
@@ -1342,12 +1497,18 @@ FocusScope {
                 root.saveSettings();
             }
 
+            onAttractModePicked: function(value) {
+                root.attractModeEnabled = value;
+                root.saveSettings();
+            }
+
             onResetRequested: {
                 root.resetSettingsToDefault();
             }
 
             onClosed: {
                 gameList.forceActiveFocus();
+                root.startIdleWatch();
             }
         }
 
@@ -1367,6 +1528,44 @@ FocusScope {
 
             onClosed: {
                 gameList.forceActiveFocus();
+                root.startIdleWatch();
+            }
+        }
+
+        AttractMode {
+            id: attractOverlay
+            anchors.fill: parent
+            z: 1800
+
+            fontFamily: fontLoader.name
+            fontScale: root.fontScale
+            palette: root.palette
+            strings: root.strings
+            videoPlaybackEnabled: root.videoPlaybackEnabled
+            volume: root.videoVolume / 100
+            gamesModel: api.allGames
+
+            onExitRequested: root.exitAttractMode()
+        }
+
+        FavoriteConfirm {
+            id: favoriteConfirmOverlay
+            anchors.fill: parent
+            z: 2700
+
+            fontFamily: fontLoader.name
+            fontScale: root.fontScale
+            palette: root.palette
+            strings: root.strings
+
+            onConfirmed: {
+                root.toggleFavorite();
+                gameList.forceActiveFocus();
+                root.startIdleWatch();
+            }
+            onCancelled: {
+                gameList.forceActiveFocus();
+                root.startIdleWatch();
             }
         }
 
@@ -1396,5 +1595,6 @@ FocusScope {
         root._previousLayoutMode = root.layoutMode;
         Qt.callLater(root.restoreState);
         Qt.callLater(root.checkForUpdates);
+        root.startIdleWatch();
     }
 }

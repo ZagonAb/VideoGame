@@ -18,10 +18,12 @@ ListView {
     property bool scrubActive: false
     property var scrubGroups: []
     property int scrubIndex: 0
+    property bool attractModeActive: false
 
     signal gameSelected(int index)
     signal gameLaunched(int index)
     signal gameChanged(var game)
+    signal attractExitRequested()
 
     clip: true
     currentIndex: 0
@@ -31,12 +33,41 @@ ListView {
     highlightMoveVelocity: -1
 
     delegate: Rectangle {
+        property var game: modelData
         width: gameListView.width - 10
         height: gameListView.height * 0.1
         color: gameListView.currentIndex === index
             ? (gameListView.palette ? gameListView.palette.accent : "#ffffff")
             : (gameListView.palette ? gameListView.palette.surface : "#000000")
         radius: gameListView.delegateRadius
+        clip: true
+
+        Item {
+            id: favoriteWatermark
+            visible: !!model.favorite
+            anchors.right: parent.right
+            anchors.rightMargin: -parent.height * 0.5
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.height
+            height: width
+            opacity: 0.3
+
+            Image {
+                id: favoriteWatermarkIcon
+                anchors.fill: parent
+                source: "assets/icons/favorite-star.svg"
+                mipmap: true
+                fillMode: Image.PreserveAspectFit
+            }
+
+            ColorOverlay {
+                anchors.fill: favoriteWatermarkIcon
+                source: favoriteWatermarkIcon
+                color: gameListView.currentIndex === index
+                    ? (gameListView.palette ? gameListView.palette.accentText : "#000000")
+                    : (gameListView.palette ? gameListView.palette.textPrimary : "#ffffff")
+            }
+        }
 
         Column {
             anchors.verticalCenter: parent.verticalCenter
@@ -243,17 +274,25 @@ ListView {
         MouseArea {
             anchors.fill: parent
             onClicked: {
+                if (gameListView.attractModeActive) {
+                    gameListView.attractExitRequested();
+                    return;
+                }
                 gameListView.currentIndex = index;
                 gameListView.gameSelected(index);
                 gameListView.positionViewAtIndex(index, ListView.Contain);
             }
             onDoubleClicked: {
+                if (gameListView.attractModeActive) {
+                    gameListView.attractExitRequested();
+                    return;
+                }
                 gameListView.gameLaunched(index);
             }
         }
     }
 
-    onCurrentIndexChanged: {
+    function emitCurrentGame() {
         if (scrubActive) return;
         if (model && model.get && currentIndex >= 0 && currentIndex < count) {
             var game = model.get(currentIndex);
@@ -261,9 +300,16 @@ ListView {
         }
     }
 
+    onCurrentIndexChanged: emitCurrentGame()
+    onCountChanged: emitCurrentGame()
+
     Keys.onUpPressed: function(event) {
+        event.accepted = true;
+        if (gameListView.attractModeActive) {
+            gameListView.attractExitRequested();
+            return;
+        }
         if (scrubActive) {
-            event.accepted = true;
             return;
         }
         if (!event.isAutoRepeat) {
@@ -278,8 +324,12 @@ ListView {
     }
 
     Keys.onDownPressed: function(event) {
+        event.accepted = true;
+        if (gameListView.attractModeActive) {
+            gameListView.attractExitRequested();
+            return;
+        }
         if (scrubActive) {
-            event.accepted = true;
             return;
         }
         if (!event.isAutoRepeat) {
@@ -294,6 +344,10 @@ ListView {
     }
 
     Keys.onReleased: function(event) {
+        if (gameListView.attractModeActive) {
+            event.accepted = true;
+            return;
+        }
         if (event.isAutoRepeat) return;
         if (event.key === Qt.Key_Up || event.key === Qt.Key_Down) {
             scrubHoldTimer.stop();

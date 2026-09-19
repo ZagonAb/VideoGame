@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import QtGraphicalEffects 1.12
 
 Rectangle {
     id: alphabetSelector
@@ -17,8 +18,20 @@ Rectangle {
     height: parent.height * 0.95
     color: palette ? palette.background : "#000000"
 
+    function countFavorites() {
+        if (!gameModel) return 0;
+        var favCount = 0;
+        for (var i = 0; i < gameModel.count; i++) {
+            var g = gameModel.get(i);
+            if (g && g.favorite) favCount++;
+        }
+        return favCount;
+    }
+
     function countGamesForLetter(letter) {
-        if (!gameModel || letter === "All") return 1;
+        if (letter === "All") return 1;
+        if (letter === "Fav") return countFavorites();
+        if (!gameModel) return 0;
 
         var count = 0;
         for (var i = 0; i < gameModel.count; i++) {
@@ -82,21 +95,23 @@ Rectangle {
     ListView {
         id: alphabetList
         anchors.fill: parent
-        model: ["All", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+        model: ["All", "Fav", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
         "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
         currentIndex: 0
 
         delegate: Rectangle {
+            property bool isFavoriteEntry: modelData === "Fav"
             property bool letterAvailable: alphabetSelector.isLetterAvailable(modelData)
             property bool isSelected: alphabetList.currentIndex === index
 
             width: alphabetSelector.width
-            height: alphabetSelector.parent.height * 0.035
+            height: alphabetList.height / alphabetList.count
             color: isSelected ? (alphabetSelector.palette ? alphabetSelector.palette.accent : "#ffffff") : "transparent"
             radius: alphabetSelector.delegateRadius
             opacity: letterAvailable ? 1.0 : 0.3
 
             Text {
+                visible: !parent.isFavoriteEntry
                 anchors.centerIn: parent
                 text: modelData
                 color: {
@@ -107,6 +122,31 @@ Rectangle {
                 font.family: alphabetSelector.fontFamily
                 font.pixelSize: alphabetSelector.parent.width * 0.016 * alphabetSelector.fontScale
                 font.bold: isSelected && letterAvailable
+            }
+
+            Item {
+                visible: parent.isFavoriteEntry
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                height: width
+
+                Image {
+                    id: favoriteLetterIcon
+                    anchors.fill: parent
+                    source: "assets/icons/favorite.svg"
+                    mipmap: true
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                ColorOverlay {
+                    anchors.fill: favoriteLetterIcon
+                    source: favoriteLetterIcon
+                    color: {
+                        if (!letterAvailable) return "#666666";
+                        if (isSelected) return alphabetSelector.palette ? alphabetSelector.palette.accentText : "#000000";
+                        return alphabetSelector.palette ? alphabetSelector.palette.textPrimary : "#ffffff";
+                    }
+                }
             }
 
             Rectangle {

@@ -19,6 +19,7 @@ FocusScope {
         titleMarquee: "Title Marquee", titleMarqueeOn: "ON", titleMarqueeOff: "OFF",
         collectionMarquee: "Collection Marquee", collectionMarqueeOn: "ON", collectionMarqueeOff: "OFF",
         videoVolume: "Video Volume", sfxVolume: "Sound Effects Volume",
+        attractMode: "Attract Mode", attractModeOn: "ON", attractModeOff: "OFF",
         reset: "Reset to Default",
         hint: "\u2191\u2193 Navigate    \u2190\u2192 Change / Reset    B Close"
     })
@@ -43,14 +44,15 @@ FocusScope {
     property bool collectionMarqueeValue: false
     property int videoVolumeValue: 100
     property int sfxVolumeValue: 100
+    property bool attractModeValue: false
     property int activeRow: 0
-    readonly property int rowCount: 14
+    readonly property int rowCount: 15
     onActiveRowChanged: Qt.callLater(scrollToActiveRow)
 
     readonly property var rowItems: [rowFont, rowFontSize, rowColorScheme, rowLanguage,
                                        rowSpacing, rowGameRadius, rowAlphaRadius,
                                        rowVideoPlayback, rowGameDescription, rowTitleMarquee, rowCollectionMarquee,
-                                       rowVideoVolume, rowSfxVolume, rowReset]
+                                       rowVideoVolume, rowSfxVolume, rowAttractMode, rowReset]
 
     function scrollToActiveRow() {
         if (activeRow < 0 || activeRow >= rowItems.length) return;
@@ -80,14 +82,15 @@ FocusScope {
     signal collectionMarqueePicked(bool value)
     signal videoVolumePicked(int value)
     signal sfxVolumePicked(int value)
+    signal attractModePicked(bool value)
     signal resetRequested()
     signal closed()
 
     visible: opacity > 0
     opacity: 0
 
-    function open(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume) {
-        syncValues(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume);
+    function open(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume, initAttractMode) {
+        syncValues(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume, initAttractMode);
         activeRow = 0;
         panelScale = 0.5;
         opacity = 0;
@@ -97,7 +100,7 @@ FocusScope {
         Qt.callLater(scrollToActiveRow);
     }
 
-    function syncValues(fIndex, scale, schemeIndex, langIndex, spacing, gameRadius, alphaRadius, videoPlayback, gameDescription, titleMarquee, collectionMarquee, videoVolume, sfxVolume) {
+    function syncValues(fIndex, scale, schemeIndex, langIndex, spacing, gameRadius, alphaRadius, videoPlayback, gameDescription, titleMarquee, collectionMarquee, videoVolume, sfxVolume, attractModeEnabled) {
         fontIndex = fIndex;
         fontScaleValue = scale;
         colorSchemeIndex = schemeIndex;
@@ -111,6 +114,7 @@ FocusScope {
         collectionMarqueeValue = collectionMarquee;
         videoVolumeValue = videoVolume;
         sfxVolumeValue = sfxVolume;
+        attractModeValue = attractModeEnabled;
     }
 
     function close() {
@@ -173,6 +177,10 @@ FocusScope {
             sfxVolumeValue = newSfxVolume;
             sfxVolumePicked(newSfxVolume);
         } else if (activeRow === 13) {
+            const newAttractMode = !attractModeValue;
+            attractModeValue = newAttractMode;
+            attractModePicked(newAttractMode);
+        } else if (activeRow === 14) {
             resetRequested();
         }
     }
@@ -186,7 +194,7 @@ FocusScope {
         if (!event.isAutoRepeat && (api.keys.isCancel(event) || api.keys.isFilters(event))) {
             event.accepted = true;
             settingsRoot.close();
-        } else if (!event.isAutoRepeat && activeRow === 13 && api.keys.isAccept(event)) {
+        } else if (!event.isAutoRepeat && activeRow === 14 && api.keys.isAccept(event)) {
             event.accepted = true;
             resetRequested();
         }
@@ -427,11 +435,24 @@ FocusScope {
                 }
 
                 SettingsRow {
-                    id: rowReset
+                    id: rowAttractMode
                     width: parent.width
                     height: panel.rowHeight
                     panelWidth: panel.width
                     active: settingsRoot.activeRow === 13
+                    fontFamily: settingsRoot.fontFamily
+                    fontScale: settingsRoot.fontScaleValue
+                    palette: settingsRoot.palette
+                    label: settingsRoot.tr("attractMode")
+                    valueText: settingsRoot.attractModeValue ? settingsRoot.tr("attractModeOn") : settingsRoot.tr("attractModeOff")
+                }
+
+                SettingsRow {
+                    id: rowReset
+                    width: parent.width
+                    height: panel.rowHeight
+                    panelWidth: panel.width
+                    active: settingsRoot.activeRow === 14
                     fontFamily: settingsRoot.fontFamily
                     fontScale: settingsRoot.fontScaleValue
                     palette: settingsRoot.palette
