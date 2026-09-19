@@ -21,7 +21,7 @@ FocusScope {
     }
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.6"
+    readonly property string currentVersion: "1.0.7"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
