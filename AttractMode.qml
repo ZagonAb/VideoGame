@@ -42,11 +42,19 @@ FocusScope {
         (currentGame && videoPlaybackEnabled && currentGame.assets && currentGame.assets.video)
             ? currentGame.assets.video : ""
 
+    property int artStage: 0
+
     readonly property string currentArtPath: {
         if (!currentGame || !currentGame.assets) return "assets/no-image/default.png";
         const a = currentGame.assets;
-        return a.background || a.screenshot || a.titlescreen || a.boxFront || "assets/no-image/default.png";
+        if (artStage === 0 && a.background) return a.background;
+        if (artStage <= 1 && a.screenshot) return a.screenshot;
+        return "assets/no-image/default.png";
     }
+
+    readonly property int currentArtFillMode:
+        (artStage === 0 && currentGame && currentGame.assets && currentGame.assets.background)
+            ? Image.PreserveAspectCrop : Image.PreserveAspectFit
 
     readonly property string currentLogoPath:
         (currentGame && currentGame.assets && currentGame.assets.logo) ? currentGame.assets.logo : ""
@@ -129,6 +137,7 @@ FocusScope {
         currentGame = pickRandomGame();
         log("new game -> " + (currentGame ? currentGame.title : "null"));
         kenBurnsDirection = randomInt(4);
+        artStage = 0;
         evaluateMedia();
         fadeInAnim.restart();
     }
@@ -230,10 +239,12 @@ FocusScope {
                 clip: true
 
                 ShaderEffectSource {
+                    id: artReflectionSource
                     anchors.fill: parent
                     sourceItem: artImage
                     hideSource: false
                     scale: 7.5
+                    live: false
 
                     layer.enabled: true
                     layer.effect: FastBlur {
@@ -254,7 +265,7 @@ FocusScope {
                 width: parent.width * 0.90
                 height: parent.height * 0.90
                 anchors.centerIn: parent
-                fillMode: Image.PreserveAspectFit
+                fillMode: attractMode.currentArtFillMode
                 asynchronous: true
                 smooth: true
                 source: attractMode.currentArtPath
@@ -263,7 +274,11 @@ FocusScope {
                 transform: Translate { id: artTranslate; x: 0; y: 0 }
 
                 onStatusChanged: {
-                    if (status === Image.Error) source = "assets/no-image/default.png";
+                    if (status === Image.Error) {
+                        if (attractMode.artStage < 2) attractMode.artStage++;
+                    } else if (status === Image.Ready) {
+                        artReflectionSource.scheduleUpdate();
+                    }
                 }
             }
         }
@@ -340,7 +355,7 @@ FocusScope {
         anchors.horizontalCenter: parent.horizontalCenter
         text: attractMode.tr("attractHint")
         font.family: attractMode.fontFamily
-        font.pixelSize: attractMode.width * 0.03 * attractMode.fontScale
+        font.pixelSize: attractMode.width * 0.02 * attractMode.fontScale
         color: attractMode.palette ? attractMode.palette.textSecondary : "#aaaaaa"
         opacity: 0.85
     }

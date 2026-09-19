@@ -21,7 +21,7 @@ FocusScope {
     }
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.7"
+    readonly property string currentVersion: "1.0.8"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -623,7 +623,7 @@ FocusScope {
 
     Timer {
         id: idleTimer
-        interval: 45000
+        interval: 90000
         repeat: false
         onTriggered: root.enterAttractMode()
     }
