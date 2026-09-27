@@ -44,13 +44,16 @@ ListView {
 
         Item {
             id: favoriteWatermark
-            visible: !!model.favorite
             anchors.right: parent.right
-            anchors.rightMargin: -parent.height * 0.5
+            anchors.rightMargin: model.favorite ? -parent.height * 0.5 : -parent.height * 1.1
             anchors.verticalCenter: parent.verticalCenter
             width: parent.height
             height: width
-            opacity: 0.3
+            opacity: 0.2
+
+            Behavior on anchors.rightMargin {
+                NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+            }
 
             Image {
                 id: favoriteWatermarkIcon

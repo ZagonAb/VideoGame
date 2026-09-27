@@ -11,8 +11,9 @@ Item {
     property var palette: null
     property bool videoPlaybackEnabled: true
     property real volume: 1.0
-    property real reflectionZoom: 7.5
-    property real reflectionZoomBoxFront: 7.5
+    property real reflectionZoom: 10.5
+    property real reflectionZoomBoxFront: 10.5
+    property real reflectionOpacity: 0.80
 
     signal videoFinished()
     signal videoError()
@@ -137,6 +138,7 @@ Item {
                     id: videoReflectionContainer
                     anchors.fill: parent
                     clip: true
+                    opacity: videoContent.reflectionOpacity
 
                     ShaderEffectSource {
                         id: videoReflectionSource
@@ -147,7 +149,7 @@ Item {
 
                         layer.enabled: true
                         layer.effect: FastBlur {
-                            radius: 60
+                            radius: 64
                             transparentBorder: true
                         }
                     }
@@ -256,6 +258,7 @@ Item {
                     id: boxFrontReflectionContainer
                     anchors.fill: parent
                     clip: true
+                    opacity: videoContent.reflectionOpacity
 
                     Image {
                         id: boxFrontReflectionImage
@@ -267,7 +270,7 @@ Item {
 
                         layer.enabled: true
                         layer.effect: FastBlur {
-                            radius: 60
+                            radius: 64
                             transparentBorder: true
                         }
 

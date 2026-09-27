@@ -21,7 +21,7 @@ FocusScope {
     }
 
     property int pendingLaunchIndex: -1
-    readonly property string currentVersion: "1.0.8"
+    readonly property string currentVersion: "1.0.9"
     property string _pendingUpdateVersion: ""
     property string _pendingUpdateUrl: ""
     property string _pendingUpdateNotes: ""
@@ -331,6 +331,9 @@ FocusScope {
     property int sfxVolume: 100
     property bool attractModeEnabled: false
     property bool attractModeActive: false
+    property bool clockEnabled: false
+    property bool batteryEnabled: false
+    property bool gameListScrollbarEnabled: false
 
     property var languages: [
         { code: "en", name: "English" },
@@ -371,6 +374,15 @@ FocusScope {
             attractMode: "Attract Mode",
             attractModeOn: "ON",
             attractModeOff: "OFF",
+            clock: "Clock",
+            clockOn: "ON",
+            clockOff: "OFF",
+            battery: "Battery",
+            batteryOn: "ON",
+            batteryOff: "OFF",
+            gameListScrollbar: "Game List Scrollbar",
+            gameListScrollbarOn: "ON",
+            gameListScrollbarOff: "OFF",
             attractBadge: "ATTRACT MODE",
             attractHint: "Press any button to browse",
             favRemoveTitle: "Remove \"%1\" from Favorites?",
@@ -415,6 +427,15 @@ FocusScope {
             attractMode: "Modo Attract",
             attractModeOn: "Activado",
             attractModeOff: "Desactivado",
+            clock: "Reloj",
+            clockOn: "Activado",
+            clockOff: "Desactivado",
+            battery: "Batería",
+            batteryOn: "Activado",
+            batteryOff: "Desactivado",
+            gameListScrollbar: "Barra de desplazamiento",
+            gameListScrollbarOn: "Activado",
+            gameListScrollbarOff: "Desactivado",
             attractBadge: "MODO ATTRACT",
             attractHint: "Presiona cualquier botón para volver",
             favRemoveTitle: "¿Quitar \"%1\" de Favoritos?",
@@ -446,6 +467,9 @@ FocusScope {
     readonly property int defaultVideoVolume: 100
     readonly property int defaultSfxVolume: 100
     readonly property bool defaultAttractModeEnabled: false
+    readonly property bool defaultClockEnabled: false
+    readonly property bool defaultBatteryEnabled: false
+    readonly property bool defaultGameListScrollbarEnabled: false
 
     readonly property string selectedFontPath: (fontIndex >= 0 && fontIndex < fontsList.length)
         ? fontsList[fontIndex].path : "assets/fonts/bebasneue/bebasneue.ttf"
@@ -511,6 +535,18 @@ FocusScope {
             const ame = api.memory.get("settingsAttractModeEnabled");
             attractModeEnabled = (ame === true || ame === "true");
         }
+        if (api.memory.has("settingsClockEnabled")) {
+            const ce = api.memory.get("settingsClockEnabled");
+            clockEnabled = (ce === true || ce === "true");
+        }
+        if (api.memory.has("settingsBatteryEnabled")) {
+            const be = api.memory.get("settingsBatteryEnabled");
+            batteryEnabled = (be === true || be === "true");
+        }
+        if (api.memory.has("settingsGameListScrollbarEnabled")) {
+            const sb = api.memory.get("settingsGameListScrollbarEnabled");
+            gameListScrollbarEnabled = (sb === true || sb === "true");
+        }
         console.log("[settings] loaded -> fontIndex:", fontIndex, "fontScale:", fontScale,
                      "colorSchemeIndex:", colorSchemeIndex, "languageIndex:", languageIndex,
                      "titleCollectionSpacing:", titleCollectionSpacing,
@@ -539,6 +575,9 @@ FocusScope {
         api.memory.set("settingsVideoVolume", videoVolume);
         api.memory.set("settingsSfxVolume", sfxVolume);
         api.memory.set("settingsAttractModeEnabled", attractModeEnabled);
+        api.memory.set("settingsClockEnabled", clockEnabled);
+        api.memory.set("settingsBatteryEnabled", batteryEnabled);
+        api.memory.set("settingsGameListScrollbarEnabled", gameListScrollbarEnabled);
         console.log("[settings] saved -> fontIndex:", fontIndex, "fontScale:", fontScale,
                      "colorSchemeIndex:", colorSchemeIndex, "languageIndex:", languageIndex,
                      "titleCollectionSpacing:", titleCollectionSpacing,
@@ -567,13 +606,17 @@ FocusScope {
         videoVolume = defaultVideoVolume;
         sfxVolume = defaultSfxVolume;
         attractModeEnabled = defaultAttractModeEnabled;
+        clockEnabled = defaultClockEnabled;
+        batteryEnabled = defaultBatteryEnabled;
+        gameListScrollbarEnabled = defaultGameListScrollbarEnabled;
         saveSettings();
         settingsOverlay.syncValues(fontIndex, fontScale, colorSchemeIndex, languageIndex,
                                     titleCollectionSpacing, gameDelegateRadius,
                                     alphabetDelegateRadius, videoPlaybackEnabled,
                                     gameDescriptionEnabled,
                                     titleMarqueeEnabled, collectionMarqueeEnabled,
-                                    videoVolume, sfxVolume, attractModeEnabled);
+                                    videoVolume, sfxVolume, attractModeEnabled,
+                                    clockEnabled, batteryEnabled, gameListScrollbarEnabled);
         console.log("[settings] reset to defaults");
     }
 
@@ -584,7 +627,8 @@ FocusScope {
                               alphabetDelegateRadius, videoPlaybackEnabled,
                               gameDescriptionEnabled,
                               titleMarqueeEnabled, collectionMarqueeEnabled,
-                              videoVolume, sfxVolume, attractModeEnabled);
+                              videoVolume, sfxVolume, attractModeEnabled,
+                              clockEnabled, batteryEnabled, gameListScrollbarEnabled);
     }
 
     function startIdleWatch() {
@@ -953,8 +997,8 @@ FocusScope {
         Math.min(root.width, root.height) / referenceMinSide
     ))
     readonly property real alphabetSelectorWidth: 50 * uiScale
-    readonly property real headerIconSize: vpx(44) * uiScale * fontScale
-    readonly property real headerFontPixelSize: vpx(44) * uiScale * fontScale
+    readonly property real headerIconSize: vpx(32) * uiScale * fontScale
+    readonly property real headerFontPixelSize: vpx(32) * uiScale * fontScale
 
     readonly property var layoutProfiles: ({
         wideStandard: {
@@ -1057,6 +1101,122 @@ FocusScope {
             }
         }
 
+        Item {
+            id: statusBar
+
+            readonly property real statusFontSize: Math.round(root.height * 0.025 * root.fontScale)
+            readonly property real statusIconSize: Math.round(statusFontSize * 1.15)
+            readonly property real statusGap:      Math.round(statusFontSize * 0.35)
+
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: Math.round(root.width * 0.014)
+            anchors.topMargin:   Math.round(root.height * 0.012)
+            height: statusFontSize * 1.4
+            width: statusRow.width
+            visible: root.clockEnabled || (root.batteryEnabled && !isNaN(batteryPoller.cachedPercent))
+            z: 50
+
+            QtObject {
+                id: batteryPoller
+                property int  cachedPercent:  0
+                property bool cachedCharging: false
+
+                function poll() {
+                    const pct = api.device.batteryPercent;
+                    if (!isNaN(pct)) {
+                        cachedPercent  = Math.round(pct * 100);
+                        cachedCharging = api.device.batteryCharging;
+                    }
+                }
+            }
+
+            Timer {
+                id: batteryTimer
+                interval: 500
+                repeat: true
+                running: root.batteryEnabled
+                triggeredOnStart: true
+                onTriggered: batteryPoller.poll()
+            }
+
+            Connections {
+                target: api.device
+                function onBatteryChargingChanged() { batteryPoller.poll() }
+                function onBatteryPercentChanged()  { batteryPoller.poll() }
+            }
+
+            Row {
+                id: statusRow
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: statusBar.statusGap
+
+                Text {
+                    id: clockText
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.clockEnabled
+                    text: Qt.formatTime(new Date(), "hh:mm")
+                    font.family: fontLoader.name
+                    font.pixelSize: statusBar.statusFontSize
+                    color: root.palette ? root.palette.textPrimary : "white"
+
+                    Timer {
+                        id: clockTimer
+                        interval: 10000
+                        repeat: true
+                        running: root.clockEnabled
+                        triggeredOnStart: true
+                        onTriggered: clockText.text = Qt.formatTime(new Date(), "hh:mm")
+                    }
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.clockEnabled && root.batteryEnabled
+                             && !isNaN(batteryPoller.cachedPercent)
+                    text: "|"
+                    font.family: fontLoader.name
+                    font.pixelSize: statusBar.statusFontSize
+                    color: root.palette ? root.palette.textSecondary : "#888888"
+                    opacity: 0.6
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.batteryEnabled && !isNaN(batteryPoller.cachedPercent)
+                    text: batteryPoller.cachedPercent + "%"
+                    font.family: fontLoader.name
+                    font.pixelSize: statusBar.statusFontSize
+                    color: root.palette ? root.palette.textPrimary : "white"
+                }
+
+                Image {
+                    id: batteryIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.batteryEnabled && !isNaN(batteryPoller.cachedPercent)
+                    width:  statusBar.statusIconSize
+                    height: statusBar.statusIconSize
+                    mipmap: true
+                    smooth: true
+                    fillMode: Image.PreserveAspectFit
+
+                    readonly property int iconIndex: {
+                        if (batteryPoller.cachedCharging)
+                            return Math.min(10, Math.round(batteryPoller.cachedPercent / 10));
+                        else
+                            return Math.min(9, Math.floor(batteryPoller.cachedPercent / 10));
+                    }
+
+                    source: batteryPoller.cachedCharging
+                        ? "assets/icons/charging/fluent--battery-charge-"
+                          + iconIndex + "-20-filled.svg"
+                        : "assets/icons/not-charging/fluent--battery-"
+                          + iconIndex + "-20-filled.svg"
+                }
+            }
+        }
+
         GameListView {
             id: gameList
             width: root.currentProfile.gameListWidthFn()
@@ -1143,6 +1303,48 @@ FocusScope {
                     root.pokeActivity();
                     console.log("[persist] gameList.currentIndex changed ->", gameList.currentIndex,
                                  "(filteredGames.count:", filteredGames.count, ")");
+                }
+            }
+        }
+
+        Item {
+            id: gameListScrollbar
+            anchors.left: gameList.right
+            anchors.leftMargin: 3
+            anchors.top: gameList.top
+            anchors.bottom: gameList.bottom
+            width: 7
+            visible: root.layoutMode !== "square"
+                     && root.gameListScrollbarEnabled
+                     && gameList.visibleArea.heightRatio < 1.0
+            opacity: visible ? 1.0 : 0.0
+
+            Behavior on opacity {
+                NumberAnimation { duration: 180; easing.type: Easing.InOutQuad }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: root.palette ? root.palette.accent : "#ffffff"
+                opacity: 0.18
+            }
+
+            Rectangle {
+                width: parent.width
+                radius: width / 2
+                color: root.palette ? root.palette.accent : "#ffffff"
+                opacity: 0.85
+
+                height: Math.max(
+                    width * 2.5,
+                    gameListScrollbar.height * gameList.visibleArea.heightRatio
+                )
+
+                y: gameList.visibleArea.yPosition * gameListScrollbar.height
+
+                Behavior on y {
+                    NumberAnimation { duration: 80; easing.type: Easing.OutQuad }
                 }
             }
         }
@@ -1426,6 +1628,8 @@ FocusScope {
             languages: root.languages
             strings: root.strings
             gameDescriptionAvailable: root.layoutMode === "wide"
+            batteryAvailable: !isNaN(api.device.batteryPercent)
+            scrollbarAvailable: root.layoutMode !== "square"
 
             onFontPicked: function(index) {
                 root.fontIndex = index;
@@ -1499,6 +1703,21 @@ FocusScope {
 
             onAttractModePicked: function(value) {
                 root.attractModeEnabled = value;
+                root.saveSettings();
+            }
+
+            onClockPicked: function(value) {
+                root.clockEnabled = value;
+                root.saveSettings();
+            }
+
+            onBatteryPicked: function(value) {
+                root.batteryEnabled = value;
+                root.saveSettings();
+            }
+
+            onGameListScrollbarPicked: function(value) {
+                root.gameListScrollbarEnabled = value;
                 root.saveSettings();
             }
 

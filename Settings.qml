@@ -20,6 +20,9 @@ FocusScope {
         collectionMarquee: "Collection Marquee", collectionMarqueeOn: "ON", collectionMarqueeOff: "OFF",
         videoVolume: "Video Volume", sfxVolume: "Sound Effects Volume",
         attractMode: "Attract Mode", attractModeOn: "ON", attractModeOff: "OFF",
+        clock: "Clock", clockOn: "ON", clockOff: "OFF",
+        battery: "Battery", batteryOn: "ON", batteryOff: "OFF",
+        gameListScrollbar: "Game List Scrollbar", gameListScrollbarOn: "ON", gameListScrollbarOff: "OFF",
         reset: "Reset to Default",
         hint: "\u2191\u2193 Navigate    \u2190\u2192 Change / Reset    B Close"
     })
@@ -40,19 +43,25 @@ FocusScope {
     property bool videoPlaybackValue: true
     property bool gameDescriptionValue: false
     property bool gameDescriptionAvailable: true
+    property bool batteryAvailable: true
     property bool titleMarqueeValue: false
     property bool collectionMarqueeValue: false
     property int videoVolumeValue: 100
     property int sfxVolumeValue: 100
     property bool attractModeValue: false
+    property bool clockValue: false
+    property bool batteryValue: false
+    property bool gameListScrollbarValue: false
+    property bool scrollbarAvailable: true
     property int activeRow: 0
-    readonly property int rowCount: 15
+    readonly property int rowCount: 18
     onActiveRowChanged: Qt.callLater(scrollToActiveRow)
 
     readonly property var rowItems: [rowFont, rowFontSize, rowColorScheme, rowLanguage,
                                        rowSpacing, rowGameRadius, rowAlphaRadius,
                                        rowVideoPlayback, rowGameDescription, rowTitleMarquee, rowCollectionMarquee,
-                                       rowVideoVolume, rowSfxVolume, rowAttractMode, rowReset]
+                                       rowVideoVolume, rowSfxVolume, rowAttractMode,
+                                       rowClock, rowBattery, rowGameListScrollbar, rowReset]
 
     function scrollToActiveRow() {
         if (activeRow < 0 || activeRow >= rowItems.length) return;
@@ -83,14 +92,17 @@ FocusScope {
     signal videoVolumePicked(int value)
     signal sfxVolumePicked(int value)
     signal attractModePicked(bool value)
+    signal clockPicked(bool value)
+    signal batteryPicked(bool value)
+    signal gameListScrollbarPicked(bool value)
     signal resetRequested()
     signal closed()
 
     visible: opacity > 0
     opacity: 0
 
-    function open(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume, initAttractMode) {
-        syncValues(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume, initAttractMode);
+    function open(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume, initAttractMode, initClock, initBattery, initGameListScrollbar) {
+        syncValues(initFontIndex, initScale, initSchemeIndex, initLanguageIndex, initSpacing, initGameRadius, initAlphaRadius, initVideoPlayback, initGameDescription, initTitleMarquee, initCollectionMarquee, initVideoVolume, initSfxVolume, initAttractMode, initClock, initBattery, initGameListScrollbar);
         activeRow = 0;
         panelScale = 0.5;
         opacity = 0;
@@ -100,7 +112,7 @@ FocusScope {
         Qt.callLater(scrollToActiveRow);
     }
 
-    function syncValues(fIndex, scale, schemeIndex, langIndex, spacing, gameRadius, alphaRadius, videoPlayback, gameDescription, titleMarquee, collectionMarquee, videoVolume, sfxVolume, attractModeEnabled) {
+    function syncValues(fIndex, scale, schemeIndex, langIndex, spacing, gameRadius, alphaRadius, videoPlayback, gameDescription, titleMarquee, collectionMarquee, videoVolume, sfxVolume, attractModeEnabled, clockEnabled, batteryEnabled, gameListScrollbarEnabled) {
         fontIndex = fIndex;
         fontScaleValue = scale;
         colorSchemeIndex = schemeIndex;
@@ -115,6 +127,9 @@ FocusScope {
         videoVolumeValue = videoVolume;
         sfxVolumeValue = sfxVolume;
         attractModeValue = attractModeEnabled;
+        clockValue = (clockEnabled !== undefined) ? clockEnabled : false;
+        batteryValue = (batteryEnabled !== undefined) ? batteryEnabled : false;
+        gameListScrollbarValue = (gameListScrollbarEnabled !== undefined) ? gameListScrollbarEnabled : false;
     }
 
     function close() {
@@ -181,6 +196,20 @@ FocusScope {
             attractModeValue = newAttractMode;
             attractModePicked(newAttractMode);
         } else if (activeRow === 14) {
+            const newClock = !clockValue;
+            clockValue = newClock;
+            clockPicked(newClock);
+        } else if (activeRow === 15) {
+            if (!batteryAvailable) return;
+            const newBattery = !batteryValue;
+            batteryValue = newBattery;
+            batteryPicked(newBattery);
+        } else if (activeRow === 16) {
+            if (!scrollbarAvailable) return;
+            const newScrollbar = !gameListScrollbarValue;
+            gameListScrollbarValue = newScrollbar;
+            gameListScrollbarPicked(newScrollbar);
+        } else if (activeRow === 17) {
             resetRequested();
         }
     }
@@ -194,7 +223,7 @@ FocusScope {
         if (!event.isAutoRepeat && (api.keys.isCancel(event) || api.keys.isFilters(event))) {
             event.accepted = true;
             settingsRoot.close();
-        } else if (!event.isAutoRepeat && activeRow === 14 && api.keys.isAccept(event)) {
+        } else if (!event.isAutoRepeat && activeRow === 17 && api.keys.isAccept(event)) {
             event.accepted = true;
             resetRequested();
         }
@@ -240,14 +269,57 @@ FocusScope {
             color: settingsRoot.palette ? settingsRoot.palette.textPrimary : "white"
         }
 
+        Item {
+            id: scrollbarItem
+            anchors.top: titleItem.bottom
+            anchors.topMargin: panel.titleSpacing
+            anchors.right: parent.right
+            anchors.rightMargin: 5
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: panel.margin
+            width: 5
+            opacity: flick.contentHeight > flick.height ? settingsRoot.opacity : 0
+            visible: opacity > 0
+
+            Behavior on opacity {
+                NumberAnimation { duration: 180; easing.type: Easing.InOutQuad }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: settingsRoot.palette ? settingsRoot.palette.accent : "#ffffff"
+                opacity: 0.18
+            }
+
+            Rectangle {
+                id: scrollThumb
+                width: parent.width
+                radius: width / 2
+                color: settingsRoot.palette ? settingsRoot.palette.accent : "#ffffff"
+                opacity: 0.85
+
+                height: Math.max(
+                    width * 2.5,
+                    scrollbarItem.height * flick.visibleArea.heightRatio
+                )
+
+                y: flick.visibleArea.yPosition * scrollbarItem.height
+
+                Behavior on y {
+                    NumberAnimation { duration: 80; easing.type: Easing.OutQuad }
+                }
+            }
+        }
+
         Flickable {
             id: flick
             anchors.top: titleItem.bottom
             anchors.topMargin: panel.titleSpacing
             anchors.left: parent.left
             anchors.leftMargin: panel.margin
-            anchors.right: parent.right
-            anchors.rightMargin: panel.margin
+            anchors.right: scrollbarItem.left
+            anchors.rightMargin: 4
             anchors.bottom: parent.bottom
             anchors.bottomMargin: panel.margin
             contentWidth: width
@@ -448,11 +520,52 @@ FocusScope {
                 }
 
                 SettingsRow {
-                    id: rowReset
+                    id: rowClock
                     width: parent.width
                     height: panel.rowHeight
                     panelWidth: panel.width
                     active: settingsRoot.activeRow === 14
+                    fontFamily: settingsRoot.fontFamily
+                    fontScale: settingsRoot.fontScaleValue
+                    palette: settingsRoot.palette
+                    label: settingsRoot.tr("clock")
+                    valueText: settingsRoot.clockValue ? settingsRoot.tr("clockOn") : settingsRoot.tr("clockOff")
+                }
+
+                SettingsRow {
+                    id: rowBattery
+                    width: parent.width
+                    height: panel.rowHeight
+                    panelWidth: panel.width
+                    active: settingsRoot.activeRow === 15
+                    rowDisabled: !settingsRoot.batteryAvailable
+                    fontFamily: settingsRoot.fontFamily
+                    fontScale: settingsRoot.fontScaleValue
+                    palette: settingsRoot.palette
+                    label: settingsRoot.tr("battery")
+                    valueText: settingsRoot.batteryValue ? settingsRoot.tr("batteryOn") : settingsRoot.tr("batteryOff")
+                }
+
+                SettingsRow {
+                    id: rowGameListScrollbar
+                    width: parent.width
+                    height: panel.rowHeight
+                    panelWidth: panel.width
+                    active: settingsRoot.activeRow === 16
+                    rowDisabled: !settingsRoot.scrollbarAvailable
+                    fontFamily: settingsRoot.fontFamily
+                    fontScale: settingsRoot.fontScaleValue
+                    palette: settingsRoot.palette
+                    label: settingsRoot.tr("gameListScrollbar")
+                    valueText: settingsRoot.gameListScrollbarValue ? settingsRoot.tr("gameListScrollbarOn") : settingsRoot.tr("gameListScrollbarOff")
+                }
+
+                SettingsRow {
+                    id: rowReset
+                    width: parent.width
+                    height: panel.rowHeight
+                    panelWidth: panel.width
+                    active: settingsRoot.activeRow === 17
                     fontFamily: settingsRoot.fontFamily
                     fontScale: settingsRoot.fontScaleValue
                     palette: settingsRoot.palette

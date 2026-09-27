@@ -1,0 +1,28 @@
+Quick wins (reusan lo que ya existe, poco código)
+
+
+2. "Random / Sorpréndeme" (botón, no automático)
+Literalmente ya tenés el 90% del código: pickRandomGame() del AttractMode. Un botón/tecla que salte a un juego random dentro de la colección filtrada actual (usando gameList.currentIndex en vez de cycleo automático). Reutilización directa, ~15 min de trabajo.
+
+3. Indicador de batería (api.device)
+Si esto corre en algo portátil (Steam Deck, RG35XX, etc.), un ícono discreto en una esquina con batteryPercent/batteryCharging (usando isNaN para ocultarlo en desktop/TV donde no aplica). Charla nada, es puro polish.
+
+Impacto medio (requieren algo de SortFilterProxyModel)
+
+4. Ordenamiento (Sort by)
+Ahora mismo asumo que listás por sortBy nomás. Agregar un selector rápido (tecla o fila en Settings tipo las que ya tenés) para reordenar por: Recently Played (lastPlayed), Most Played (playCount), Rating, Release Year. Usando SortFilterProxyModel con RoleSorter, que ya está importado en la doc del API.
+
+5. Fila "Continuar jugando" / "Recientes"
+Con lastPlayed + playCount, un carrusel chico arriba de la lista principal (o un filtro especial) mostrando los últimos 5-10 jugados. Le da mucha sensación de "consola real" a la interfaz.
+
+Más ambicioso (pero con buen retorno)
+
+6. Selector de disco/archivo (game.files)
+Si tenés juegos multi-disco (PS1 con 2-3 CDs, por ejemplo), la API expone files con su propio launch(). Ahora mismo probablemente Pegasus muestra su selector default feo; podrías interceptar eso y mostrar un modal con tu estética (reutilizando el look de launchOverlay).
+
+7. "Efeméride" / On this day
+Con releaseMonth/releaseDay podrías, al arrancar el tema o dentro del Attract Mode, priorizar juegos que salieron "un día como hoy" en años anteriores — un toque nostálgico gratis que combina bien con lo que ya armamos.
+
+Mi apuesta personal por dónde seguir: Favoritos primero (es la pieza que más se nota que falta dado que el campo ya está ahí y es writable), y Random como bonus de 10 minutos porque básicamente ya está escrito.
+
+¿Con cuál arrancamos?
