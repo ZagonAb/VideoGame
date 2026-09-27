@@ -1210,9 +1210,9 @@ FocusScope {
 
                     source: batteryPoller.cachedCharging
                         ? "assets/icons/charging/fluent--battery-charge-"
-                          + iconIndex + "-20-filled.svg"
+                          + iconIndex + "-20-regular.svg"
                         : "assets/icons/not-charging/fluent--battery-"
-                          + iconIndex + "-20-filled.svg"
+                          + iconIndex + "-20-regular.svg"
                 }
             }
         }
